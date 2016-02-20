@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+
+<!-- *********************** HEAD *********************** -->
+<head>
+<style type="text/css">
+.knitr .inline {
+  background-color: #f7f7f7;
+  border:solid 1px #B0B0B0;
+}
+.error {
+	font-weight: bold;
+	color: #FF0000;
+}
+.warning {
+	font-weight: bold;
+}
+.message {
+	font-style: italic;
+}
+.source, .output, .warning, .error, .message {
+	padding: 0 1em;
+  border:solid 1px #F7F7F7;
+}
+.source {
+  background-color: #f5f5f5;
+}
+.rimage .left {
+  text-align: left;
+}
+.rimage .right {
+  text-align: right;
+}
+.rimage .center {
+  text-align: center;
+}
+.hl.num {
+  color: #AF0F91;
+}
+.hl.str {
+  color: #317ECC;
+}
+.hl.com {
+  color: #AD95AF;
+  font-style: italic;
+}
+.hl.opt {
+  color: #000000;
+}
+.hl.std {
+  color: #585858;
+}
+.hl.kwa {
+  color: #295F94;
+  font-weight: bold;
+}
+.hl.kwb {
+  color: #B05A65;
+}
+.hl.kwc {
+  color: #55aa55;
+}
+.hl.kwd {
+  color: #BC5A65;
+  font-weight: bold;
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="author" content="Prof. Dr. Johannes Binswanger" />
+ 
+<title>Programming for Practical Data Analysis</title>
+
+<!-- ******* LIBRARIES AND PLUGINS ******* -->
+
+<!-- my own css file -->
+<link rel="stylesheet" href="css/baseline.css" type="text/css" />
+
+<!-- jquery, nestedToc, slidesjs ... -->
+<script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript">//call jquery library</script>
+
+<script src="js/jquery-nestedToc.js">// get nestedToc from http://www.jqueryscript.net/menu/Dynamic-Table-of-Contents-Generator-With-jQuery-nestedToc.html
+</script>
+
+<script src="js/jquery.slides.min.js"></script>
+
+
+</head>
+
+<!-- *********************** END OF HEAD *********************** -->
+
+<body>
+<!-- ************************************** -->
+<!-- AUTOMATIC INSERTION OF "BACK TO TOP"-->
+<script>
+// Select all headers to prepend "back to top" link.
+// However, exclude the first heading, and the author and date
+// Do so by creating a class noBackToTop. It is possible to assign multiple classes to an element.
+// See http://stackoverflow.com/questions/3015103/jquery-exclude-elements-with-certain-class-in-selector
+
+//NOTE: It is very important to use .before and not .prepend below!!!
+// If you use prepend, the TOC gets screwed as the text shows up there as well!!
+
+$(document).ready(function(){
+	// Automatic "back to top" before a new heading, but not when the heading is of class noBackToTop, because 
+	// there is immediately a subheading
+    $(":header:not('.noBackToTop')").before("<p><a href='#docHeader'; style = 'font-size:1em; color: #A0A0A0'>[Back to top]</a></p>");
+	// The back to top at the end of the document
+	 $(".scriptText").append("<p><a href='#docHeader' style = 'font-size:1em; color: #A0A0A0'>[Back to top]</a></p>");
+	 
+	 //Horizontal ruler
+	 $("h1:not('.noBackToTop')").before("<div class='markEnd'> </div>");
+	 
+	 
+	
+});
+
+
+</script>
+
+
+
+<!-- ************************************** 
+     **************************************
+	 **************************************
+	 
+-->
+
+
+
+
+
+
+
+
+<div id="content">
+
+<!-- *********************** TITLE ITEMS *********************** -->
+
+<div id="docHeader">
+    <p class="title">Programming for Practical Data Analysis</p>
+    <h4 class="author noBackToTop"><em>Johannes Binswanger, University of St. Gallen</em></h4>
+    <h4 class="date noBackToTop"><em>Spring 2016</em></h4>
+</div> <!-- end of docHeader div -->
+
+
+
+<!-- *********************** TABLE OF CONTENT (TOC) *********************** -->
+
+<!-- This contains a toggle button 
+and the table of content -->
+
+<div class="tocContainer">
+     
+<script>
+//jQuery code for toggle button
+$( document ).ready( function( ) {
+$( ".TOCbutton" ).click(function() {
+  $( ".tocToggleContainer" ).toggle();
+});
+});
+</script>
+
+<!-- the button -->
+<button class="TOCbutton" style="color: #27738C;font-size: 20px;">Show/hide table of content</button>
+
+
+
+
+</div>
+
+<div class="tocToggleContainer">
+<!-- This div is empty, for the toggle -->
+</div>
+
+<!-- The following div below has the same class as the previous!! And do not forget to add the particular styling about display. Note that the second div contains another div that contains the toc. This is to keep both the toc and the toggle work. It may not be necessary with the particular toc solution chosen here, but it is necessary for other toc solutions.
+-->
+    <div class="tocToggleContainer" style="display: none">
+    <div class = "toc">
+        <script>
+        // This script is simply copied from 
+        // http://www.jqueryscript.net/menu/Dynamic-Table-of-Contents-Generator-With-jQuery-nestedToc.html
+        $( document ).ready( function( ) {
+        $('.toc').nestedToc({
+    
+        container: '.scriptText'
+    
+      });
+      });
+      </script>
+</div>
+</div>
+
+
+
+
+
+<!-- Button for download as pdf -->
+<!-- Do NOT use something like 
+
+<button class = "downloadPDF"><a href="test.pdf" style="color: #27738C; text-decoration:none;">Get this page as PDF</a></button>
+
+Although it works in Chrome, Android, Edge, it doesn't in Firexox an IE. The problem is the anchor tags inside the button. With only the anchor tags not inside the button, everything works well. 
+
+There is a solution that works for all browsers, luckily: JavaScript, as specified below.
+
+-->
+
+<!-- *********************** Download as pdf DISABLED  *********************** 
+
+
+<button class="downloadPDF" onclick = "window.open('pdfs/script_as_pdf.pdf')" style="color: #27738C;">
+Get this page as PDF</button>
+
+-->
+
+
+<!-- ************************************************************************* -->
+
+
+<!-- *********************** MAIN DOCUMENT STARTS HERE *********************** -->
+
+
+
+<!-- ************************************************************************* -->
+
+
+
+<div class = "scriptText"> <!-- This div contains the main text -->
+
+
+
+
+
+
+
+
+<!-- *********************** INTRODUCTION *********************** -->
+<h1 id="introduction" class="noBackToTop" style = "padding-top: 20px;">Introduction</h1>
+
+
+<p>In a world full of cars, driving is a useful skill. Indeed, many people know how to drive. In a world full of data - such as our modern world - programming skills for data analysis are highly useful. However, many people do <em>not</em> know how to program, including many economics students &hellip; Why is data analysis so important in today's world? This is because the modern world is so rich with data, and because data underlie important decisions made in governments, firms, NGOs and elsewhere. Or, at least, that's how it should be &hellip;</p>
+
+<p>In this course, you will learn essential elements of programming that allow you to analyze and visualize data, as well as communicate your results such that they can be distributed to decision making teams in ministries and boardrooms. So, importantly, this course is not "just" about programming. It's about the whole process of data-based decision making. This includes the collection of data, data analysis, data visualization, and communication.
+</p>
+
+
+<p>Now, "programming" is a sort of awe-inspiring word. What does it actually mean? During this course you will learn to understand that programming is <em>not</em> so much about making complicated calculations and statistical analysis. And it's not just about coding. What programming really is about is the <b>automation of tasks</b>. More poetically, programming is about finding universal solution procedures to problems by making use of algorithms. That sounds awesome but also pretty abstract. Keep it in mind and during the course you will learn to understand what this means.</p>
+
+<p>In this course we will make use of the programming environment of the <em>R language</em>. R has become extremely popular as a tool for data analysis in recent years (see <a href="http://r4stats.com/articles/popularity/" target = "_blank">article</a> on r4stats). R is much more popular among programmers than commercial software, with the exception of SAS and SPSS (the latter only among academics). However, SPSS offers generally less functionality. Other popular programming languages are Python and Java. Python is also quite easy to learn, however, it is somewhat cumbersome to get it running on Windows machines. As for Java, it takes considerably more time before you can do anything sophisticated. As you can see in the mentioned article, R is clearly more popular than Stata or Matlab when it comes to job requirements (in the analytics business). It is also more popular among academics, but only marginally so. However, I figured that most of you do not necessarily want to become academics, and so, all in all, R seemed the best-suited programming language for this course.</p>
+
+<p>But why not just having an advanced course in Excel? Well, excel is not really a useful analytics tool since it is not made for programming. This means that you forgo many options to <em>automate</em> your analysis. Automation means that you write your code only once, and whenever your boss wants to see a new analysis, you change a parameter, hit a button, and within a minute you have a beautiful new report. In Excel, you would possibly be clicking around for several hours, and you would most likely make mistakes on that way. In other words, you would feel pretty miserable. You will get to understand better what I mean during this course. As a side-note, it is possible to program with Excel. However, this would require to learn the Visual Basic programming language. It seems much more practical to directly learn R, instead!</p>
+
+
+<p></p>
+<p></p>
+
+
+
+<!-- *************************************************************************************** -->
+
+
+
+<h1 id="organization-of-this-course">Organization of this course</h1>
+
+
+<h2 id="structure-of-this-course" class="noBackToTop">Structure of the course</h2>
+
+<p>This course features <a href = "https://www1.unisg.ch/org/st-ppp/vprgso16.nsf/(vwLStudienplanByNumber)/6,246,1.00?OpenDocument" target = "_blank/"> 11 units</a>. The course is structured as follows:
+	<ol> <li> Introduction into the most important elements of R and data analysis; on the playground using fake data; 4 sessions
+		<li> Applying programming with R "in the wild"; we will analyze data published by the Swiss National Bank; 4 sessions
+		<li> Do-it-yourself group-projects and in-class presentations; 2 sessions
+		<li> Open-laptop/Google exam in the last session
+	</ol>
+
+</p>
+
+<h2 id="group-projects">Home-assignments</h2>
+
+<p>Doing things yourself, spending time on figuring out what happens if you change this or that piece of code is absolutely essential for learning to program. Therefore, you will regularly be asked to solve some programming problems at home, although probably not every single session.</p>
+
+<p style = "padding-left:40px; padding-right: 70px"><span style = "color:#e60000;">NOTE: At the beginning of the class, some of you will be asked on a random basis to present your solution or &mdash; if you were not able to solve it &mdash; comment on your experience and why you run into troubles. 
+</span></p>
+
+<p>Occasionally, I may also ask you an open-ended question using the <em>Test</em> feature on StudyNet. For your answer, you may have to copy a piece of code into the answer field. You will get additional instructions on this.</p>
+
+
+<h2 id="group-projects">Group projects</h2>
+
+<p>You will be working on a project where you put into practice what you have learned in this course. You will work in <b>groups of 4 students</b>. You will analyze data that highlight important aspects of a practical decision problem at the government or in a company or NGO. You are free to propose your own topic and data; however, you will need my approval.
+Topics will be assigned in the session of <b>March 31</b>. You will present your results in short elevator-pitch-like presentations in the sessions on <b>May 12 and May 19</b>.</p>
+
+
+<h2 id="exam-and-grading">Exams and grading</h2>
+
+<p>The overall grade for this course will depend on both the quality of your group-project and the written exam. Note that you will write the exam on your own device during the last session of this course. You will be given time to upload the exam to StudyNet at the end of the session. The group assignment counts for 60 percent, the written exam for 40 percent of your overall grade. Please find further information in the <a href = "pdfs/Kursmerkblatt.pdf" target="_blank"><em>Kursmerkblatt</em></a>. The exam will include questions where you have to google for the solution of a problem that you have not yet seen in exactly this form. You will train this during the course and while working on your group project. In another type of exam question, you will have to understand a piece of code that someone else has written, potentially with a mistake. All these exam questions prepare you for real-life analytics.</p>
+
+
+<h2 id="lecture-notes-and-books">Lecture notes, books, further readings &hellip;</h2>
+
+<blockquote class="leadingQuote"><q><i>When learning to code, Google is your best friend...</i></q>
+<a href = http://stackoverflow.com/questions/14830014/add-image-s-inside-a-div-with-jquery target="_blank">Stackoverflow</a></blockquote>
+
+<p>For this course, you do not have to read any books. The best source for R documentation is the Internet, as the quote above suggests. In fact, books become quickly outdated since R is evolving rapidly. Therefore, you will have to learn to rely on googling. You will also find quite a number of good videos on Youtube. Finding solutions through googling will also be an important learning goal of this course.</p>
+
+<p>Having said this, the most important material for this course, in terms of documentation, are the R and markdown scripts that we will work out together during classes. These scripts will contain many comments that allow you to understand what we are doing. A second important source are these notes you are just reading, in form of a simple website. I have tried my best to make this website somehow readable on any device and for any browser. However, some features do not look optimal for some browsers (sliders look somewhat ugly in Safari, and it is not possible to make the text bigger in Edge). If you encounter troubles, try to use Chrome; if that also does not work, let me know.</p>
+
+<p style = "padding-left:40px; padding-right: 70px"><span style = "color:#e60000;">NOTE: After each class, the R scripts that we worked on during class will be published in these lecture notes, together with any remarks that seem noteworthy in light of the discussions during class.
+</span></p>
+
+<p>If you nevertheless feel better having a book in your hands, this one is actually very well written, very accessible, and still mostly up-to-date:
+<ul><li>Jared P. Lander, <em>R for Everyone</em>, Addison Wesley Data & Analytics Series, 2014
+</ul>
+</p>
+
+<h2 id="communication">Communication</h2>
+
+<p>If you feel that a particular topic remained unclear and you want me to get back to it during the following class, or if you have suggestions for covering additional material, feel free to send an email to <span style = "color:#27738C">johannes.binswanger@unisg.ch</span>. I will also try to set up a forum on StudyNet where you can send anonymous feedback. But please be constructive, even if it's anonymous &hellip;</p>
+
+
+
+
+
+
+
+
+
+<!-- ************  GETTING STARTED ********************  -->
+
+
+
+
+<h1 id="lecture1">Lecture 1</h1>
+
+<p>During the first session, we will do the following:
+<ul><li>Installing R (the "engine"); we will discuss what version you'll need, what operating system you have, whether or not it's 32 or 64 bits etc.
+<li> Installing RStudio (the editor we will work with)
+<li> Typing first commands
+<li> First get-to-know of data types such as numeric and string vectors, and data frames
+</ul>
+</p>
+
+
+<p>I will demonstrate how to install R and RStudio on a Windows 10 machine during the first class. I will also have a Mac with me, but will not demonstrate the download for Macs. Instead, if you have a Mac, you can get some guidance from the simple slide show below that features a number of screenshots that document the essential steps of the installation process. The slides  show both the installation of R and of RStudio.</p>
+
+  
+
+
+<!-- ************  IMAGES SLIDE SHOW ********************  -->
+
+
+<!-- Use Slide.js
+http://www.slidesjs.com/
+Download and select... I chose the Standard version, see Slides-SlidesJS-3/examples/standard
+-->
+
+
+<div class="slideFrame">
+<div class="container">
+<p class="slideShowTitle"><i>SLIDESHOW: </i>Here are some screenshots I made when installing R and RStudio on a Mac</p>
+    <div id="slides">
+    <img src="images/image (1).png" >
+    <img src="images/image (2).png" >
+      <img src="images/image (3).png" >
+	  <img src="images/image (4).png" >
+	  <img src="images/image (5).png" >
+	  <img src="images/image (6).png" >
+	  <img src="images/image (7).png" >
+	  <img src="images/image (8).png" >
+	  <img src="images/image (9).png" >
+	  <img src="images/image (10).png" >
+	  <img src="images/image (11).png" >
+    <img src="images/image (12).png" >
+      <img src="images/image (13).png" >
+	  <img src="images/image (14).png" >
+	  <img src="images/image (15).png" >
+	  <img src="images/image (16).png" >
+	  <img src="images/image (17).png" >
+	  <img src="images/image (18).png" >
+	  <img src="images/image (19).png" >
+	  <img src="images/image (20).png" >
+	  <img src="images/image (21).png" >
+    <img src="images/image (22).png" >
+      <img src="images/image (23).png" >
+	  <img src="images/image (24).png" >
+	  <img src="images/image (25).png" >
+	  <img src="images/image (26).png" >
+	  <img src="images/image (27).png" >
+	  <img src="images/image (28).png" >
+	  <img src="images/image (29).png" >
+	  <img src="images/image (30).png" >
+	  <img src="images/image (31).png" >
+    <img src="images/image (32).png" >
+      <img src="images/image (33).png" >
+	  <img src="images/image (34).png" >
+	  <img src="images/image (35).png" >
+	  <img src="images/image (36).png" >
+	  <img src="images/image (37).png" >
+	  
+      
+      <a href="#" class="slidesjs-previous slidesjs-navigation"><i class="icon-chevron-left icon-large"></i></a>
+      <a href="#" class="slidesjs-next slidesjs-navigation"><i class="icon-chevron-right icon-large"></i></a>
+    </div>
+  </div>
+ </div>
+  
+  
+
+  <script>
+    $(function() {
+      $('#slides').slidesjs({
+        width: 800,
+        height: 520,//USE THIS LINE TO REGULATE DISTANCE BETWEEN PREVIOUS/NEXT AND IMAGE!!!
+        navigation: {active: true}
+      });
+    });
+	
+	
+	
+  </script>
+  
+  
+
+  
+
+
+
+<!-- ************ END OF IMAGES SLIDE SHOW ********************  -->
+
+</br>  
+
+</br>  
+
+
+
+
+
+
+
+
+</div> <!-- end of div scriptText -->
+
+
+<div class='markEnd'> </div> <!-- A last horizontal ruler at the end of the document-->
+
+</div> <!-- end of content div -->
+
+</body>
+</html>
