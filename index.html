@@ -65,6 +65,68 @@
   font-weight: bold;
 }
 </style>
+<style type="text/css">
+.knitr .inline {
+  background-color: #f7f7f7;
+  border:solid 1px #B0B0B0;
+}
+.error {
+	font-weight: bold;
+	color: #FF0000;
+}
+.warning {
+	font-weight: bold;
+}
+.message {
+	font-style: italic;
+}
+.source, .output, .warning, .error, .message {
+	padding: 0 1em;
+  border:solid 1px #F7F7F7;
+}
+.source {
+  background-color: #f5f5f5;
+}
+.rimage .left {
+  text-align: left;
+}
+.rimage .right {
+  text-align: right;
+}
+.rimage .center {
+  text-align: center;
+}
+.hl.num {
+  color: #AF0F91;
+}
+.hl.str {
+  color: #317ECC;
+}
+.hl.com {
+  color: #AD95AF;
+  font-style: italic;
+}
+.hl.opt {
+  color: #000000;
+}
+.hl.std {
+  color: #585858;
+}
+.hl.kwa {
+  color: #295F94;
+  font-weight: bold;
+}
+.hl.kwb {
+  color: #B05A65;
+}
+.hl.kwc {
+  color: #55aa55;
+}
+.hl.kwd {
+  color: #BC5A65;
+  font-weight: bold;
+}
+</style>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="author" content="Prof. Dr. Johannes Binswanger" />
@@ -332,16 +394,7 @@ Topics will be assigned in the session of <b>March 31</b>. You will present your
 
 <h1 id="lecture1">Lecture 1</h1>
 
-<p>During the first session, we will do the following:
-<ul><li>Installing R (the "engine"); we will discuss what version you'll need, what operating system you have, whether or not it's 32 or 64 bits etc.
-<li> Installing RStudio (the editor we will work with)
-<li> Typing first commands
-<li> First get-to-know of data types such as numeric and string vectors, and data frames
-</ul>
-</p>
-
-
-<p>I will demonstrate how to install R and RStudio on a Windows 10 machine during the first class (see this <a href="pdfs/Installing R on Win10.pdf" target = "_blank">pdf</a> for a quick-and-dirty documentation of the most important screenshots). I will also have a Mac with me, but will not demonstrate the download for Macs. Instead, if you have a Mac, you can get some guidance from the simple slide show below that features a number of screenshots that document the essential steps of the installation process. The slides  show both the installation of R and of RStudio.</p>
+<p>During the first session, we did install R and RStudio. Although we had some problems with the WiFi hotspot, it worked for most or you. In this <a href="pdfs/Installing R on Win10.pdf" target = "_blank">pdf</a> you find some quick-and-dirty documentation of the most important screenshots for installing R and RStudio on a Windows 10 machine. Below, you find a simple slide show that shows the installation on a Mac.</p>
 
   
 
@@ -431,11 +484,128 @@ Download and select... I chose the Standard version, see Slides-SlidesJS-3/examp
 
 </br>  
 
+<p>During class, we worked out the following script (note that below you can also see the results of our commands).</p>
 
 
+<div class="chunk" id="unnamed-chunk-1"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com"># R live script, Lecture 1, Feb 25, 2016</span>
 
+<span class="hl std">a</span> <span class="hl kwb">=</span> <span class="hl num">2</span>
+<span class="hl std">a</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 2
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Variables have types. Let's see what's</span>
+<span class="hl com"># the type of a...</span>
+<span class="hl kwd">class</span><span class="hl std">(a)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;numeric&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Are there other types?</span>
+<span class="hl std">aAsChar</span> <span class="hl kwb">=</span> <span class="hl str">&quot;a&quot;</span>
+<span class="hl std">aAsChar</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;a&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">class</span><span class="hl std">(aAsChar)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;character&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Go on...</span>
+<span class="hl std">b</span> <span class="hl kwb">=</span> <span class="hl num">3</span>
+<span class="hl std">bAsWhatever</span> <span class="hl kwb">=</span> <span class="hl std">b</span>
+<span class="hl std">bAsWhatever</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 3
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Let's do some algebra</span>
+<span class="hl std">a</span><span class="hl opt">+</span><span class="hl std">b</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 5
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">a</span><span class="hl opt">*</span><span class="hl std">b</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 6
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">a</span><span class="hl opt">^</span><span class="hl std">b</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 8
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">i</span> <span class="hl kwb">&lt;-</span> <span class="hl num">1</span>  <span class="hl com"># Assignment operator</span>
+        <span class="hl com"># same as &quot;=&quot;, the latter is also assignment operator</span>
+<span class="hl std">i</span> <span class="hl kwb">=</span> <span class="hl num">1</span>
+<span class="hl std">j</span> <span class="hl kwb">=</span> <span class="hl std">i</span>  <span class="hl com"># passed by value</span>
+<span class="hl std">i</span> <span class="hl kwb">=</span> <span class="hl num">2</span>
+<span class="hl com"># What will j be?</span>
+<span class="hl std">j</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 1
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">i</span> <span class="hl opt">==</span> <span class="hl std">j</span> <span class="hl com"># this is nothing else as 2 == 1</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] FALSE
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># &quot;=&quot; is an assignment operator</span>
+<span class="hl com"># &quot;==&quot; means mathematical equality</span>
 
+<span class="hl std">l</span> <span class="hl kwb">=</span> <span class="hl std">i</span> <span class="hl opt">==</span><span class="hl std">j</span>
+<span class="hl std">l</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] FALSE
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">class</span><span class="hl std">(l)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;logical&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">######################################################</span>
+<span class="hl com">######################################################</span>
 
+<span class="hl com"># Beyond the most basic data structures</span>
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;milk (l)&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;cereals (packs)&quot;</span><span class="hl std">,</span>
+             <span class="hl str">&quot;quollfrisch (packs)&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># shopList is a vector</span>
+
+<span class="hl std">quantList</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">3</span><span class="hl std">,</span> <span class="hl num">2</span><span class="hl std">,</span> <span class="hl num">5</span><span class="hl std">)</span>
+
+<span class="hl std">priceList</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">1.95</span><span class="hl std">,</span> <span class="hl num">2.05</span><span class="hl std">,</span> <span class="hl num">11.95</span><span class="hl std">)</span>
+
+<span class="hl std">shoppingData</span> <span class="hl kwb">=</span> <span class="hl kwd">data.frame</span><span class="hl std">(shopList, quantList, priceList)</span>
+
+<span class="hl kwd">class</span><span class="hl std">(shoppingData)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;data.frame&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">shoppingData</span><span class="hl opt">$</span><span class="hl std">expPerItem</span> <span class="hl kwb">=</span>
+  <span class="hl std">shoppingData</span><span class="hl opt">$</span><span class="hl std">quantList</span><span class="hl opt">*</span><span class="hl std">shoppingData</span><span class="hl opt">$</span><span class="hl std">priceList</span>
+
+<span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;myShopList.txt&quot;</span><span class="hl std">,</span> <span class="hl kwc">append</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+<span class="hl std">shoppingData</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##              shopList quantList priceList expPerItem
+## 1            milk (l)         3      1.95       5.85
+## 2     cereals (packs)         2      2.05       4.10
+## 3 quollfrisch (packs)         5     11.95      59.75
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">sink</span><span class="hl std">()</span>
+<span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;myShopList.txt&quot;</span><span class="hl std">)</span>
+</pre></div>
+</div></div>
+
+<p>To sum up, you have learned to following during this lecture:
+<ul>
+  <li>There are a number of different data types:
+  <ul>
+    <li>numeric types
+    <li>character types
+    <li>logical types
+    <li>data frames (i.e. a sort of spreadsheet)
+  </ul>
+  <li> &quot;=&quot; or &quot;<-&quot; means assignment
+  <li> &quot;= =&quot; means mathematical equality
+</ul>
+</p>
+
+<p>Next time, we'll dig a little deeper.</p>
 
 
 </div> <!-- end of div scriptText -->
