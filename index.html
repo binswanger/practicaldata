@@ -615,6 +615,192 @@ Download and select... I chose the Standard version, see Slides-SlidesJS-3/examp
 <p>Next time, we'll dig a little deeper.</p>
 
 
+<!-- ************************************************************** -->
+
+
+<h1 id="lecture2">Lecture 2</h1>
+
+<p>During class, we worked on the following lines of code.</p>
+
+<div class="chunk" id="unnamed-chunk-2"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">#################</span>
+<span class="hl com"># Lecture 2 live</span>
+<span class="hl com">#################</span>
+
+<span class="hl com"># Topics of this lecture</span>
+<span class="hl com"># 1) Juggling with dataframes</span>
+<span class="hl com"># 2) Reading data from a website</span>
+<span class="hl com"># 3) Package</span>
+<span class="hl com"># 4) Loops</span>
+<span class="hl com"># 5) Drawing random numbers from a particular</span>
+<span class="hl com">#   distribution (if we get there)</span>
+
+<span class="hl com"># Install XML package</span>
+<span class="hl com"># Do this only once per machine!</span>
+<span class="hl com"># It's like an app</span>
+<span class="hl com"># install.packages(&quot;XML&quot;)</span>
+
+<span class="hl com"># Call the package/library</span>
+<span class="hl com"># Do this in every session</span>
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">())</span>
+<span class="hl kwd">library</span><span class="hl std">(</span><span class="hl str">&quot;XML&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">shopList_0</span> <span class="hl kwb">=</span> <span class="hl kwd">readHTMLTable</span><span class="hl std">(</span><span class="hl str">&quot;http://www.einkaufszettel.de/einkaufslisten/einkaufszettel-vorlage&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList_0)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;list&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># This is a list, new data type</span>
+<span class="hl kwd">length</span><span class="hl std">(shopList_0)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] 2
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Select second list item</span>
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl std">shopList_0[[</span><span class="hl num">2</span><span class="hl std">]]</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;data.frame&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">class</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">V1)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;factor&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># The type of this variable is factor</span>
+<span class="hl com"># and we don't like that, for what we want to do</span>
+<span class="hl com"># We want &quot;character&quot;</span>
+<span class="hl std">shopList[]</span> <span class="hl kwb">=</span> <span class="hl kwd">lapply</span><span class="hl std">(shopList, as.character)</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">V1)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;character&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">test1</span> <span class="hl kwb">=</span> <span class="hl std">shopList[</span>   <span class="hl num">1</span> <span class="hl std">,</span> <span class="hl com">#rows </span>
+                      <span class="hl std">]</span> <span class="hl com">#columns</span>
+                        <span class="hl com"># empty means ALL!</span>
+<span class="hl std">test1</span> <span class="hl kwb">=</span> <span class="hl std">shopList[</span><span class="hl num">1</span><span class="hl std">, ]</span>
+<span class="hl kwd">class</span><span class="hl std">(test1)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;data.frame&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">test2</span> <span class="hl kwb">=</span> <span class="hl std">shopList[ ,</span> <span class="hl num">1</span><span class="hl std">]</span>
+<span class="hl kwd">class</span><span class="hl std">(test2)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;character&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">test3</span> <span class="hl kwb">=</span> <span class="hl std">shopList[ ,</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">2</span><span class="hl std">)]</span>
+
+<span class="hl com"># delete row 1 and 18 from shopList</span>
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl std">shopList[</span> <span class="hl opt">-</span><span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">1</span><span class="hl std">,</span><span class="hl num">18</span><span class="hl std">) ,  ]</span>
+
+<span class="hl com">#columns to select</span>
+<span class="hl std">sel</span> <span class="hl kwb">=</span> <span class="hl kwd">seq</span><span class="hl std">(</span><span class="hl num">1</span><span class="hl std">,</span> <span class="hl num">9</span><span class="hl std">,</span> <span class="hl kwc">by</span><span class="hl std">=</span><span class="hl num">2</span><span class="hl std">)</span>
+
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl std">shopList[ , sel]</span>
+
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">(</span><span class="hl kwc">pattern</span> <span class="hl std">=</span> <span class="hl str">&quot;^test&quot;</span><span class="hl std">))</span>
+
+<span class="hl com"># Tests for getting all shopping items in one column</span>
+<span class="hl std">test1</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">V1,</span>
+          <span class="hl std">shopList</span><span class="hl opt">$</span><span class="hl std">V3,</span>
+          <span class="hl std">shopList</span><span class="hl opt">$</span><span class="hl std">V5,</span>
+          <span class="hl std">shopList</span><span class="hl opt">$</span><span class="hl std">V7,</span>
+          <span class="hl std">shopList</span><span class="hl opt">$</span><span class="hl std">V9</span>
+          <span class="hl std">)</span>
+
+<span class="hl std">test1</span> <span class="hl kwb">=</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(test1)</span>
+
+<span class="hl std">test2</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">()</span> <span class="hl com">#initialization</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">ncol</span><span class="hl std">(shopList)){</span>
+  <span class="hl com"># Here is our algorithm</span>
+  <span class="hl std">test2</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(test2, shopList[ , i])</span>
+<span class="hl std">}</span>
+<span class="hl std">test2</span> <span class="hl kwb">=</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(test2)</span>
+
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl std">test2</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;data.frame&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># Change name of the single variable in shopList</span>
+<span class="hl kwd">names</span><span class="hl std">(shopList)</span> <span class="hl kwb">=</span> <span class="hl str">&quot;item&quot;</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">item)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;factor&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com">#Convert this to character</span>
+<span class="hl std">shopList[]</span> <span class="hl kwb">=</span> <span class="hl kwd">lapply</span><span class="hl std">(shopList, as.character)</span>
+<span class="hl kwd">class</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">item)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;character&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;inspectWhatWeAreDoing.txt&quot;</span><span class="hl std">,</span> <span class="hl kwc">append</span><span class="hl std">=</span><span class="hl num">FALSE</span><span class="hl std">)</span>
+<span class="hl std">shopList</span><span class="hl opt">$</span><span class="hl std">item</span> <span class="hl opt">==</span> <span class="hl str">&quot;&quot;</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##   [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [12]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [23] FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+##  [34]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [45] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
+##  [56] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [67] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE FALSE
+##  [78] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [89] FALSE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [100] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE
+## [111]  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [122] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE FALSE FALSE
+## [133] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [144] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE FALSE
+## [155] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE
+## [166]  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [177] FALSE FALSE  TRUE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+## [188]  TRUE  TRUE  TRUE
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">which</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">item</span> <span class="hl opt">==</span> <span class="hl str">&quot;&quot;</span><span class="hl std">)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##  [1]  12  13  14  15  16  27  28  29  30  31  32  33  34  35  36  37  38
+## [18]  50  51  52  53  54  74  75  76  90  91  92 106 107 108 109 110 111
+## [35] 112 113 114 128 129 130 149 150 151 152 162 163 164 165 166 167 168
+## [52] 179 182 183 184 185 186 187 188 189 190
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">sink</span><span class="hl std">()</span>
+<span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;inspectWhatWeAreDoing.txt&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># In class, we got until here. </span>
+
+<span class="hl com"># Now we still want to drop the empty rows from shopList</span>
+<span class="hl com"># In class, I still typed the following (how commented out with hashtags)</span>
+
+<span class="hl com"># shopList = shopList[-which(shopList$item == &quot;&quot;) , ]</span>
+
+<span class="hl com"># This does not yield the desired result, for somewhat complicated reasons</span>
+<span class="hl com"># Let's not bother right now. </span>
+<span class="hl com"># Instead, the following works</span>
+
+<span class="hl std">shopList</span> <span class="hl kwb">=</span> <span class="hl kwd">as.data.frame</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">item[</span><span class="hl opt">-</span><span class="hl kwd">which</span><span class="hl std">(shopList</span><span class="hl opt">$</span><span class="hl std">item</span> <span class="hl opt">==</span> <span class="hl str">&quot;&quot;</span><span class="hl std">) ])</span>
+<span class="hl kwd">names</span><span class="hl std">(shopList)</span> <span class="hl kwb">=</span> <span class="hl str">&quot;item&quot;</span>
+</pre></div>
+</div></div>
+
+<p>During class, the very last command did not achieve what we wanted, namely deleting
+all empty rows for the <code>item</code> column of the dataframe. In the above script, I added two lines that actually achieve what we want. (The reason why the piece we typed in class does not work is a bit complicated, let's not bother&hellip;) </p>
+
+<p>The most important things you have seen during this lecture are the following.
+<ul>
+  <li> Install a package with <code>install.packages(&lt;package name in quotes&gt;)</code>. You have to do this only once on a particular machine.
+  <li> Load packages with <code>library(&lt;package name in quotes&gt;)</code>.
+  <li> There is a data type <code>list</code>.
+  <li> There is a data type <code>factor</code>.
+  <li> You can select rows and columns from a data frame with <code>dataframe[&lt;rows&gt;,&lt;columns&gt;]</code>.
+  <li> You can select multiple rows or columns, and you can <i>un</i>select columns by using a minus sign.
+  <li>Use loops for &rdquo;repetitive&ldquo; tasks.
+  <li>Give names to columns/variables with <code>names(dataframe)</code>.
+  <li>And a few more things&hellip;
+</ul>
+</p>
+
+<p> </p>
+
+<p> </p>
+
+
 </div> <!-- end of div scriptText -->
 
 
