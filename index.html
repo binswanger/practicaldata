@@ -798,9 +798,19 @@ all empty rows for the <code>item</code> column of the dataframe. In the above s
 
 <h1 id="lecture3">Lecture 3</h1>
 
-<p>In this lecture, we will for the first time work with real data! We will download them from the <a href = "https://data.snb.ch/de/topics" target = "_blank">data portal</a> of the Swiss national bank.</p>
+<p>In this lecture, we first touched real data, downloaded them from the <a href = "https://data.snb.ch/de/topics" target = "_blank">data portal</a> of the Swiss national bank.</p>
 
-<p>Downloading data can be tricky. Well, not the actual download, but you can get nasty surprises when discovering that the data appear in a very &rdquo;ugly&ldquo; format. See this <a href="pdfs/MessyCSV_screens.pdf" target = "_blank"> link</a> for some screenshots together with hints about how to proceed. How the data look like will depend on the local settings of your device.</p>
+<p>As we found out (at least some of you), downloading data in <code>csv</code> format can be tricky. Well, not the actual download, but you can get nasty surprises when discovering that the data appear in a pretty &rdquo;ugly&ldquo; format. See this <a href="pdfs/MessyCSV_screens.pdf" target = "_blank"> link</a> for some screenshots together with hints about how to proceed.</p>
+
+<p>In sum, you have the following options when you get an &rdquo;ugly&ldquo; csv file. One or the other may work, hopefully&hellip;
+<ul>
+	<li>Change the regional settings of your machine to match the region of the data platform (in case of the OECD use English &ndash; United States).
+	<li>Open Excel and import the &rdquo;ugly&ldquo; file from the <code>Data</code> tab, using <code>Get external data / from text</code>. Play around with the options in the import wizard. Quite often, the solution is to use <code>semicolon</code> as the delimiter, and potentially add <code>other</code>, and insert double quotes (&rdquo;) into the field next to other. This may lead to many empty columns, but it is easy to delete them after reading the data into R.
+	<li>Open the &rdquo;ugly&ldquo; file with Notepad (Windows) or TextEdit (Mac). Inspect visually what's wrong and adjust the delimiter in the Excel import wizard accordingly (see previous point).
+	<li>Read the &rdquo;ugly&ldquo; data into R using the <code>read.table(&hellip;)</code> command. Then use the string functions of the <code>stringr</code> package. This is a bit more advanced, we have not talked about this. But if you need it, Google and Youtube will get you there!
+</ul>
+</p>
+
 
 
 </div> <!-- end of div scriptText -->
