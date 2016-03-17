@@ -68,6 +68,68 @@
 <style type="text/css">
 .knitr .inline {
   background-color: #f7f7f7;
+  border:solid 1px #B0B0B0;
+}
+.error {
+	font-weight: bold;
+	color: #FF0000;
+}
+.warning {
+	font-weight: bold;
+}
+.message {
+	font-style: italic;
+}
+.source, .output, .warning, .error, .message {
+	padding: 0 1em;
+  border:solid 1px #F7F7F7;
+}
+.source {
+  background-color: #f5f5f5;
+}
+.rimage .left {
+  text-align: left;
+}
+.rimage .right {
+  text-align: right;
+}
+.rimage .center {
+  text-align: center;
+}
+.hl.num {
+  color: #AF0F91;
+}
+.hl.str {
+  color: #317ECC;
+}
+.hl.com {
+  color: #AD95AF;
+  font-style: italic;
+}
+.hl.opt {
+  color: #000000;
+}
+.hl.std {
+  color: #585858;
+}
+.hl.kwa {
+  color: #295F94;
+  font-weight: bold;
+}
+.hl.kwb {
+  color: #B05A65;
+}
+.hl.kwc {
+  color: #55aa55;
+}
+.hl.kwd {
+  color: #BC5A65;
+  font-weight: bold;
+}
+</style>
+<style type="text/css">
+.knitr .inline {
+  background-color: #f7f7f7;
   border:solid #B0B0B0;
 }
 .error {
@@ -811,6 +873,262 @@ all empty rows for the <code>item</code> column of the dataframe. In the above s
 </ul>
 </p>
 
+<p>Note that we did not run any code in Lecture 3. We spent the time understanding and inspecting the inner life of csv files.</p>
+
+<!-- ################################################# -->
+
+<h1 id="lecture4">Lecture 4</h1>
+
+<p>In Lecture 4, we did the following:</p>
+
+<p><ul>
+<li>Delete all empty columns in a data frame with a loop; within the loop, we used conditional <code>if</code> statements.
+<li>Getting all values in a particular column of a data frame.
+<li>Making a simple annotated &rdquo;codebook&ldquo;; this is particularly useful for larger data sets.
+<li> Changing particular values in a column of a data frame.
+<li> Renaming columns/variables in a data frame.
+</ul></p>
+
+<p>Below you find the script we worked on during class. I added a few comments and run it on a Windows machine. Please note that we did not run the last few lines in class (they are clearly marked below, after the line with exclamation marks). Please copy them into your script and make sure they run before next class.</p>
+
+
+<div class="chunk" id="unnamed-chunk-1"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">################## </span>
+<span class="hl com"># Lecture 4 LIVE #</span>
+<span class="hl com">##################</span>
+
+<span class="hl com"># Empty working directory</span>
+<span class="hl com"># Good idea to alsways do this at the beginning of a script</span>
+
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">())</span>
+
+
+<span class="hl com"># Set working directory</span>
+<span class="hl com"># I did this in Windows, so note the double backslashes</span>
+<span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">&quot;D:\\Dropbox\\Mac&amp;Surf\\KursLiveDropb&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">aussen</span> <span class="hl kwb">=</span> <span class="hl kwd">read.table</span><span class="hl std">(</span><span class="hl str">&quot;aussenSNB_clean.csv&quot;</span><span class="hl std">,</span> <span class="hl kwc">header</span> <span class="hl std">=</span> <span class="hl num">TRUE</span><span class="hl std">,</span>
+           <span class="hl kwc">sep</span> <span class="hl std">=</span> <span class="hl str">&quot;,&quot;</span><span class="hl std">,</span>
+           <span class="hl kwc">stringsAsFactors</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+
+<span class="hl com"># We want to delete the empty columns with a loop...</span>
+<span class="hl com"># First the pieces we need in isolation</span>
+
+<span class="hl std">aussen[[</span><span class="hl num">2</span><span class="hl std">]]</span> <span class="hl com"># second column</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##    [1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##   [24] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##   [47] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##   [70] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##   [93] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [116] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [139] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [162] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [185] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [208] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [231] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [254] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [277] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [300] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [323] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [346] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [369] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [392] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [415] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [438] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [461] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [484] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [507] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [530] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [553] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [576] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [599] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [622] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [645] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [668] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [691] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [714] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [737] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [760] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [783] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [806] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [829] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [852] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [875] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [898] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [921] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [944] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [967] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+##  [990] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1013] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1036] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1059] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1082] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1105] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1128] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1151] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1174] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1197] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1220] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1243] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1266] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+## [1289] NA NA NA NA
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">all</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(aussen[[</span><span class="hl num">2</span><span class="hl std">]]))</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] TRUE
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># conditional</span>
+<span class="hl kwa">if</span> <span class="hl std">(</span><span class="hl kwd">all</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(aussen[[</span><span class="hl num">2</span><span class="hl std">]]))</span> <span class="hl opt">==</span> <span class="hl num">TRUE</span><span class="hl std">) {</span>
+  <span class="hl std">test</span> <span class="hl kwb">=</span> <span class="hl str">&quot;delete me!&quot;</span>
+<span class="hl std">}</span>
+<span class="hl std">test</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;delete me!&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># And now the full loop that collects the numbers of </span>
+<span class="hl com"># the columns to be deleted</span>
+<span class="hl std">toDelete</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">()</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">ncol</span><span class="hl std">(aussen)){</span>
+      <span class="hl kwa">if</span> <span class="hl std">(</span><span class="hl kwd">all</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(aussen[[i]]))</span> <span class="hl opt">==</span> <span class="hl num">TRUE</span><span class="hl std">) {</span>
+            <span class="hl std">toDelete</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(toDelete, i)</span>
+      <span class="hl std">}</span>
+<span class="hl std">}</span>
+<span class="hl std">toDelete</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##  [1]  2  3  5  6  7  8 10 11 12 13 15 16 17 18
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># If you have no empty columns, then the value of </span>
+<span class="hl com"># toDelete is NULL</span>
+
+<span class="hl com"># Check it out</span>
+<span class="hl kwd">is.null</span><span class="hl std">(toDelete)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] FALSE
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl com"># If toDelete is NOT null, then delete the empty columns.</span>
+<span class="hl com"># Otherwise, do nothing</span>
+<span class="hl kwa">if</span> <span class="hl std">(</span><span class="hl kwd">is.null</span><span class="hl std">(toDelete)</span><span class="hl opt">==</span><span class="hl num">FALSE</span><span class="hl std">){</span>
+<span class="hl std">aussen</span> <span class="hl kwb">=</span> <span class="hl std">aussen[ ,</span> <span class="hl opt">-</span><span class="hl std">toDelete]</span>
+<span class="hl std">}</span>
+
+<span class="hl com">#############################</span>
+<span class="hl com"># Read exchange rates</span>
+
+<span class="hl com"># Exactly the same steps as above</span>
+
+<span class="hl std">devisen</span> <span class="hl kwb">=</span> <span class="hl kwd">read.table</span><span class="hl std">(</span><span class="hl str">&quot;devisenSNB_clean.csv&quot;</span><span class="hl std">,</span> <span class="hl kwc">header</span> <span class="hl std">=</span> <span class="hl num">TRUE</span><span class="hl std">,</span>
+                    <span class="hl kwc">sep</span> <span class="hl std">=</span> <span class="hl str">&quot;,&quot;</span><span class="hl std">,</span>
+                    <span class="hl kwc">stringsAsFactors</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+
+<span class="hl std">toDelete</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">()</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">1</span><span class="hl opt">:</span><span class="hl kwd">ncol</span><span class="hl std">(devisen)){</span>
+  <span class="hl kwa">if</span> <span class="hl std">(</span><span class="hl kwd">all</span><span class="hl std">(</span><span class="hl kwd">is.na</span><span class="hl std">(devisen[[i]]))</span> <span class="hl opt">==</span> <span class="hl num">TRUE</span><span class="hl std">) {</span>
+    <span class="hl std">toDelete</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(toDelete, i)</span>
+  <span class="hl std">}</span>
+<span class="hl std">}</span>
+<span class="hl std">toDelete</span>
+</pre></div>
+<div class="output"><pre class="knitr r">##  [1]  2  3  5  6  7  8 10 11 12 13
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwa">if</span> <span class="hl std">(</span><span class="hl kwd">is.null</span><span class="hl std">(toDelete)</span><span class="hl opt">==</span><span class="hl num">FALSE</span><span class="hl std">){</span>
+  <span class="hl std">devisen</span> <span class="hl kwb">=</span> <span class="hl std">devisen[ ,</span> <span class="hl opt">-</span><span class="hl std">toDelete]</span>
+<span class="hl std">}</span>
+
+<span class="hl com">########################</span>
+
+<span class="hl com"># Inspect aussen</span>
+<span class="hl com"># Make a sort of &quot;codebook&quot; (often a very useful thing)</span>
+<span class="hl com"># Here it's just a mini version. It's all the more useful if the </span>
+<span class="hl com"># variables have dozens of values</span>
+
+<span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;inspectAussen.txt&quot;</span><span class="hl std">,</span> <span class="hl kwc">append</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+
+    <span class="hl kwd">cat</span><span class="hl std">(</span><span class="hl str">&quot;\nThe variables D0 contains\n\n&quot;</span><span class="hl std">)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## The variables D0 contains
+</pre></div>
+<div class="source"><pre class="knitr r">    <span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">D0)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;E&quot; &quot;A&quot; &quot;H&quot;
+</pre></div>
+<div class="source"><pre class="knitr r">    <span class="hl kwd">cat</span><span class="hl std">(</span><span class="hl str">&quot;\n\nThe variables D1 contains\n\n&quot;</span><span class="hl std">)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## 
+## The variables D1 contains
+</pre></div>
+<div class="source"><pre class="knitr r">    <span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">D1)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;RH&quot; &quot;E&quot;  &quot;I&quot;  &quot;K&quot;  &quot;T&quot;
+</pre></div>
+<div class="source"><pre class="knitr r">    <span class="hl kwd">cat</span><span class="hl std">(</span><span class="hl str">&quot;\n\nThe variables D2 contains\n\n&quot;</span><span class="hl std">)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## 
+## 
+## The variables D2 contains
+</pre></div>
+<div class="source"><pre class="knitr r">    <span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">D2)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;WMF&quot; &quot;R&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">sink</span><span class="hl std">()</span>
+<span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;inspectAussen.txt&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Get better variable/label names</span>
+<span class="hl com"># Note, I am a bit sloppy with the word &quot;variable&quot;.</span>
+<span class="hl com"># Here, I mean entry in particular columns. They will</span>
+<span class="hl com"># ultimately become &quot;variable names&quot; in the sense of statistics</span>
+<span class="hl com"># (or Stata) in one or two weeks...</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D0[aussen</span><span class="hl opt">$</span><span class="hl std">D0</span> <span class="hl opt">==</span> <span class="hl str">&quot;E&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Einfuhr&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D0[aussen</span><span class="hl opt">$</span><span class="hl std">D0</span> <span class="hl opt">==</span> <span class="hl str">&quot;A&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Ausfuhr&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D0[aussen</span><span class="hl opt">$</span><span class="hl std">D0</span> <span class="hl opt">==</span> <span class="hl str">&quot;H&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Handelsbilanzsaldo&quot;</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D1[aussen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;RH&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Rohstoffe und Halbfabrikate&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D1[aussen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;E&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Energieträger&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D1[aussen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;I&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Investitionsgüter&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D1[aussen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;K&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Konsumgüter&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D1[aussen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;T&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Total&quot;</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D2[aussen</span><span class="hl opt">$</span><span class="hl std">D2</span> <span class="hl opt">==</span> <span class="hl str">&quot;WMF&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Wert&quot;</span>
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">D2[aussen</span><span class="hl opt">$</span><span class="hl std">D2</span> <span class="hl opt">==</span> <span class="hl str">&quot;R&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Veränderung real&quot;</span>
+
+<span class="hl com">#Column names</span>
+<span class="hl kwd">names</span><span class="hl std">(aussen)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;Date&quot;  &quot;D0&quot;    &quot;D1&quot;    &quot;D2&quot;    &quot;Value&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">names</span><span class="hl std">(aussen)</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;date&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;caItem&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;sector&quot;</span><span class="hl std">,</span>
+                <span class="hl str">&quot;measure&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;value&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! # </span>
+
+<span class="hl com"># WE DIT **NOT** RUN THE FOLLOWING CODE IN CLASS,</span>
+<span class="hl com"># BUT PLEASE DO SO BEFORE NEXT TIME, SUCH THAT WE GAIN</span>
+<span class="hl com"># SOME TIME!</span>
+
+<span class="hl kwd">names</span><span class="hl std">(devisen)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;Date&quot;  &quot;D0&quot;    &quot;D1&quot;    &quot;Value&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl kwd">unique</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">D1)</span>
+</pre></div>
+<div class="output"><pre class="knitr r">## [1] &quot;EUR1&quot; &quot;GBP1&quot; &quot;USD1&quot;
+</pre></div>
+<div class="source"><pre class="knitr r"><span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">D1[devisen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;EUR1&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Euro per CHF&quot;</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">D1[devisen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;GBP1&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;GBP per CHF&quot;</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">D1[devisen</span><span class="hl opt">$</span><span class="hl std">D1</span> <span class="hl opt">==</span> <span class="hl str">&quot;USD1&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;USD per CHF&quot;</span>
+
+<span class="hl com"># Delete D0</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">D0</span> <span class="hl kwb">=</span> <span class="hl kwa">NULL</span> <span class="hl com"># This is how you delete an entire column</span>
+
+<span class="hl com"># Better column names</span>
+<span class="hl kwd">names</span><span class="hl std">(devisen)</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl str">&quot;date&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;currency&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;value&quot;</span><span class="hl std">)</span>
+
+<span class="hl com">#########################</span>
+</pre></div>
+</div></div>
 
 
 </div> <!-- end of div scriptText -->
