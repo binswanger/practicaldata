@@ -1131,6 +1131,182 @@ all empty rows for the <code>item</code> column of the dataframe. In the above s
 </div></div>
 
 
+
+
+<h1 id="lecture5">Lecture 5</h1>
+
+<p>In order to speed up a bit, I provide you with some code before class. We will go through it carefully and run it during class (although it is probably more code than we can master during one lecture). Below, you just get the code, no output.</p>
+
+<p>You can copy this code and just append it to the code we run during Lecture 4.</p>
+
+<div class="chunk" id="unnamed-chunk-2"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com"># Make a plot </span>
+<span class="hl kwd">hist</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">value[devisen</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">])</span>
+
+
+<span class="hl com"># Make it nicer</span>
+<span class="hl kwd">hist</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">value[devisen</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">],</span>
+     <span class="hl kwc">main</span> <span class="hl std">=</span> <span class="hl str">&quot;Distribution of Euro/CHF exchange rate&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">xlab</span> <span class="hl std">=</span> <span class="hl str">&quot;Euro/CHF&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">col</span> <span class="hl std">=</span> <span class="hl str">&quot;red&quot;</span><span class="hl std">,</span>
+     <span class="hl kwc">breaks</span> <span class="hl std">=</span> <span class="hl num">35</span><span class="hl std">)</span>
+
+<span class="hl com"># go to color picker for hex codes!</span>
+
+
+<span class="hl com"># save a plot (also works for jpeg and png)</span>
+<span class="hl kwd">pdf</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.pdf&quot;</span><span class="hl std">)</span>
+  <span class="hl kwd">hist</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">value[devisen</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">],</span>
+       <span class="hl kwc">main</span> <span class="hl std">=</span> <span class="hl str">&quot;Distribution of Euro/CHF exchange rate&quot;</span><span class="hl std">,</span>
+       <span class="hl kwc">xlab</span> <span class="hl std">=</span> <span class="hl str">&quot;Euro/CHF&quot;</span><span class="hl std">,</span>
+       <span class="hl kwc">col</span> <span class="hl std">=</span> <span class="hl str">&quot;#DA6704&quot;</span><span class="hl std">,</span>
+       <span class="hl kwc">breaks</span> <span class="hl std">=</span> <span class="hl num">35</span><span class="hl std">)</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+<span class="hl com"># See http://www.statmethods.net/advgraphs/parameters.html</span>
+
+<span class="hl kwd">summary</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">value[devisen</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">])</span>
+
+<span class="hl com"># Quantiles</span>
+<span class="hl kwd">quantile</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">value[devisen</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">],</span>
+         <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">0.01</span><span class="hl std">,</span><span class="hl num">0.05</span><span class="hl std">,</span><span class="hl kwd">seq</span><span class="hl std">(</span><span class="hl num">0.1</span><span class="hl std">,</span><span class="hl num">0.90</span><span class="hl std">,</span><span class="hl num">0.10</span><span class="hl std">),</span><span class="hl num">0.95</span><span class="hl std">,</span> <span class="hl num">0.99</span><span class="hl std">))</span>
+
+<span class="hl com"># You can use this with sink! But it is not possible to use sink with plots</span>
+
+<span class="hl com">##########################################</span>
+
+<span class="hl com"># We want to merge aussen and devisen</span>
+<span class="hl com"># Problem: devisen has monthly values, </span>
+<span class="hl com"># aussen has quarterly values</span>
+
+<span class="hl com"># So what we need to do is:</span>
+
+<span class="hl com"># 1) calculate quarterly averages of exchange rates for each currency</span>
+<span class="hl com"># 2) calculate a common unique identifier for merging</span>
+
+<span class="hl com"># In order to calculate quarterly averages, we need a variable indicating</span>
+<span class="hl com"># quarters</span>
+
+<span class="hl kwd">class</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">date)</span>
+<span class="hl com"># We have the date as string, need to convert it to numeric</span>
+<span class="hl com"># For this, we need the stringr package</span>
+
+<span class="hl com">#install.packages(&quot;stringr&quot;)</span>
+<span class="hl kwd">library</span><span class="hl std">(</span><span class="hl str">&quot;stringr&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">year</span> <span class="hl kwb">=</span> <span class="hl kwd">as.numeric</span><span class="hl std">(</span>  <span class="hl kwd">substr</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">date,</span> <span class="hl kwc">start</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">stop</span> <span class="hl std">=</span> <span class="hl num">4</span><span class="hl std">)  )</span>
+
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl kwb">=</span> <span class="hl kwd">as.numeric</span><span class="hl std">(</span>  <span class="hl kwd">substr</span><span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">date,</span> <span class="hl kwc">start</span> <span class="hl std">=</span> <span class="hl num">6</span><span class="hl std">,</span> <span class="hl kwc">stop</span> <span class="hl std">=</span> <span class="hl num">7</span><span class="hl std">)  )</span>
+
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">quarter</span> <span class="hl kwb">=</span> <span class="hl num">1</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">quarter[devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl opt">&gt;=</span><span class="hl num">4</span> <span class="hl opt">&amp;</span> <span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl opt">&lt;</span> <span class="hl num">7</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl num">2</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">quarter[devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl opt">&gt;=</span><span class="hl num">7</span> <span class="hl opt">&amp;</span> <span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl opt">&lt;</span> <span class="hl num">10</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl num">3</span>
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">quarter[devisen</span><span class="hl opt">$</span><span class="hl std">month</span> <span class="hl opt">&gt;=</span><span class="hl num">10</span> <span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl num">4</span>
+
+<span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">timeID</span> <span class="hl kwb">=</span> <span class="hl std">devisen</span><span class="hl opt">$</span><span class="hl std">year</span> <span class="hl opt">+</span> <span class="hl std">(devisen</span><span class="hl opt">$</span><span class="hl std">quarter</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">)</span><span class="hl opt">/</span><span class="hl num">4</span>
+
+
+<span class="hl std">devisenAgg</span> <span class="hl kwb">=</span> <span class="hl kwd">aggregate</span><span class="hl std">(value</span> <span class="hl opt">~</span> <span class="hl std">timeID</span> <span class="hl opt">+</span> <span class="hl std">currency,</span>
+                       <span class="hl std">devisen,</span>
+                       <span class="hl std">mean)</span>
+
+<span class="hl com"># calculate timeID also for aussen</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">year</span> <span class="hl kwb">=</span> <span class="hl kwd">as.numeric</span><span class="hl std">(</span>  <span class="hl kwd">substr</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">date,</span> <span class="hl kwc">start</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">stop</span> <span class="hl std">=</span> <span class="hl num">4</span><span class="hl std">)  )</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">quarter</span> <span class="hl kwb">=</span> <span class="hl kwd">as.numeric</span><span class="hl std">(</span>  <span class="hl kwd">substr</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">date,</span> <span class="hl kwc">start</span> <span class="hl std">=</span> <span class="hl num">7</span><span class="hl std">,</span> <span class="hl kwc">stop</span> <span class="hl std">=</span> <span class="hl num">7</span><span class="hl std">)  )</span>
+
+<span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">timeID</span> <span class="hl kwb">=</span> <span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">year</span> <span class="hl opt">+</span> <span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">quarter</span><span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">)</span><span class="hl opt">/</span><span class="hl num">4</span>
+
+
+<span class="hl com"># Prepare new dataframe for main analysis for specific x and y data</span>
+<span class="hl com">###################################################################</span>
+
+<span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">cuItem)</span>
+<span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">sector)</span>
+<span class="hl kwd">unique</span><span class="hl std">(aussen</span><span class="hl opt">$</span><span class="hl std">measure)</span>
+
+<span class="hl std">xData</span> <span class="hl kwb">=</span> <span class="hl std">devisenAgg[devisenAgg</span><span class="hl opt">$</span><span class="hl std">currency</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">, ]</span>
+<span class="hl std">yData</span> <span class="hl kwb">=</span> <span class="hl std">aussen[aussen</span><span class="hl opt">$</span><span class="hl std">caItem</span> <span class="hl opt">==</span> <span class="hl str">&quot;Ausfuhr&quot;</span> <span class="hl opt">&amp;</span>
+               <span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">sector</span> <span class="hl opt">==</span> <span class="hl str">&quot;Total&quot;</span> <span class="hl opt">&amp;</span>
+               <span class="hl std">aussen</span><span class="hl opt">$</span><span class="hl std">measure</span> <span class="hl opt">==</span> <span class="hl str">&quot;Veränderung real&quot;</span><span class="hl std">, ]</span>
+
+<span class="hl std">Data</span> <span class="hl kwb">=</span> <span class="hl kwd">merge</span><span class="hl std">(xData, yData,</span> <span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;timeID&quot;</span><span class="hl std">)</span>
+
+<span class="hl kwd">names</span><span class="hl std">(Data)[</span><span class="hl kwd">names</span><span class="hl std">(Data)</span> <span class="hl opt">==</span> <span class="hl str">&quot;value.x&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;xrateValue&quot;</span>
+
+<span class="hl kwd">names</span><span class="hl std">(Data)[</span><span class="hl kwd">names</span><span class="hl std">(Data)</span> <span class="hl opt">==</span> <span class="hl str">&quot;value.y&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;caItemValue&quot;</span>
+
+<span class="hl kwd">plot</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">value.x, Data</span><span class="hl opt">$</span><span class="hl std">value.y)</span>
+
+<span class="hl com">##########################################################</span>
+
+<span class="hl com"># This plot is too basic, we want a better one. For this, we need a new package,</span>
+<span class="hl com"># called ggplot2</span>
+<span class="hl com">#install.packages(&quot;ggplot2&quot;) #As usual, run this only once on any device</span>
+
+<span class="hl com"># Call the package for our current session</span>
+<span class="hl kwd">library</span><span class="hl std">(</span><span class="hl str">&quot;ggplot2&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Here are different versions of plots you can create with ggplot</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">()</span>
+
+
+<span class="hl kwd">pdf</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.pdf&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">()</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+
+<span class="hl kwd">pdf</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.pdf&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">()</span> <span class="hl opt">+</span>
+  <span class="hl kwd">xlab</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">currency))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ylab</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">caItem),</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">sector),</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">measure)))</span>
+<span class="hl com">#  ylab(paste(unique(Data$caItem), &quot;-&quot;, unique(Data$sector), &quot;-&quot;, unique(Data$measure)))</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+<span class="hl kwd">png</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.png&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">()</span> <span class="hl opt">+</span>
+  <span class="hl kwd">xlab</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">currency))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ylab</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">caItem),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">sector),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">measure)))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ggtitle</span><span class="hl std">(</span><span class="hl str">&quot;Meine erste coole Graphik&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+
+<span class="hl kwd">jpeg</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.jpeg&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">&quot;red&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">xlab</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">currency))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ylab</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">caItem),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">sector),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">measure)))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ggtitle</span><span class="hl std">(</span><span class="hl str">&quot;Meine erste coole Graphik&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+
+<span class="hl kwd">jpeg</span><span class="hl std">(</span><span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;myPlot.jpeg&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">ggplot</span><span class="hl std">(Data,</span> <span class="hl kwd">aes</span><span class="hl std">(</span><span class="hl kwc">x</span> <span class="hl std">= xrateValue,</span> <span class="hl kwc">y</span> <span class="hl std">= caItemValue))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_point</span><span class="hl std">(</span><span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">&quot;red&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">geom_smooth</span><span class="hl std">(</span><span class="hl kwc">method</span> <span class="hl std">= lm,</span> <span class="hl kwc">color</span> <span class="hl std">=</span> <span class="hl str">&quot;#66ffff&quot;</span><span class="hl std">)</span> <span class="hl opt">+</span>
+  <span class="hl kwd">xlab</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">currency))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ylab</span><span class="hl std">(</span><span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">caItem),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">sector),</span> <span class="hl str">&quot;-&quot;</span><span class="hl std">,</span> <span class="hl kwd">unique</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">measure)))</span> <span class="hl opt">+</span>
+  <span class="hl kwd">ggtitle</span><span class="hl std">(</span><span class="hl str">&quot;Meine erste coole Graphik&quot;</span><span class="hl std">)</span>
+<span class="hl kwd">dev.off</span><span class="hl std">()</span>
+
+
+<span class="hl com"># And, finally, run a regression</span>
+
+<span class="hl kwd">lm</span><span class="hl std">(xrateValue</span> <span class="hl opt">~</span> <span class="hl std">caItemValue, Data)</span>
+
+<span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;regOutput.txt&quot;</span><span class="hl std">,</span> <span class="hl kwc">append</span> <span class="hl std">=</span> <span class="hl num">FALSE</span><span class="hl std">)</span>
+<span class="hl kwd">summary</span><span class="hl std">(</span><span class="hl kwd">lm</span><span class="hl std">(xrateValue</span> <span class="hl opt">~</span> <span class="hl std">caItemValue, Data))</span>
+<span class="hl kwd">sink</span><span class="hl std">()</span>
+<span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;regOutput.txt&quot;</span><span class="hl std">)</span>
+</pre></div>
+</div></div>
+
+
+
 </div> <!-- end of div scriptText -->
 
 
