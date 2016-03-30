@@ -401,7 +401,7 @@ Get this page as PDF</button>
 	<ol> <li> Introduction into the most important elements of R and data analysis; on the playground using fake data; 2 sessions
 		<li> Applying programming with R "in the wild"; we will analyze data published by the Swiss National Bank; 6 sessions
 		<li> Do-it-yourself group-projects and in-class presentations; 2 sessions
-		<li> Open-laptop/Google exam in the last session
+		<li> Graded assignment in the last session
 	</ol>
 
 </p>
@@ -418,13 +418,12 @@ Get this page as PDF</button>
 
 <h2 id="group-projects">Group projects</h2>
 
-<p>You will be working on a project where you put into practice what you have learned in this course. You will work in <b>groups of 4 students</b>. You will analyze data that highlight important aspects of a practical decision problem at the government or in a company or NGO. You are free to propose your own topic and data; however, you will need my approval.
-Topics will be assigned in the session of <b>March 31</b>. You will present your results in short elevator-pitch-like presentations in the sessions on <b>May 12 and May 19. Attendence of these sessions is mandatory.</b></p>
+<p>You will be working on a project where you put into practice what you have learned in this course. You will work in <b>groups of 3 students</b>. You are free to propose your own topic and data. You will present your results in short elevator-pitch-like presentations in the sessions on <b>May 12 and May 19. Attendence of these sessions is mandatory.</b> You find more detailed instructions for the group projects on StudyNet under <i>Kursunterlagen</i>.</p>
 
 
 <h2 id="exam-and-grading">Exams and grading</h2>
 
-<p>The overall grade for this course will depend on both the quality of your group-project and the written exam. Note that you will write the exam on your own device during the last session of this course. You will be given time to upload the exam to StudyNet at the end of the session. The group assignment counts for 60 percent, the written exam for 40 percent of your overall grade. Please find further information in the <a href = "pdfs/Kursmerkblatt.pdf" target="_blank"><em>Kursmerkblatt</em></a>. The exam will include questions where you have to google for the solution of a problem that you have not yet seen in exactly this form. You will train this during the course and while working on your group project. In another type of exam question, you will have to understand a piece of code that someone else has written, potentially with a mistake. All these exam questions prepare you for real-life analytics.</p>
+<p>The overall grade for this course will depend on both the quality of your group-project and the in-class assignment during the last session. The group assignment counts for 60 percent, the in-class assignment counts for 40 percent of your overall grade. Please find further information in the <a href = "pdfs/Kursmerkblatt.pdf" target="_blank"><em>Kursmerkblatt</em></a>. The in-class assignment will include questions where you have to google for the solution of a problem that you have not yet seen in exactly this form. You will train this during the course and while working on your group project. Furthermore, you will have to understand a piece of code that someone else has written, potentially with a mistake. All thi prepares you for real-life analytics.</p>
 
 
 <h2 id="lecture-notes-and-books">Lecture notes, books, further readings &hellip;</h2>
@@ -1236,11 +1235,20 @@ all empty rows for the <code>item</code> column of the dataframe. In the above s
 
 <span class="hl kwd">names</span><span class="hl std">(Data)[</span><span class="hl kwd">names</span><span class="hl std">(Data)</span> <span class="hl opt">==</span> <span class="hl str">&quot;value.y&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;caItemValue&quot;</span>
 
-<span class="hl kwd">plot</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">value.x, Data</span><span class="hl opt">$</span><span class="hl std">value.y)</span>
+<span class="hl kwd">plot</span><span class="hl std">(Data</span><span class="hl opt">$</span><span class="hl std">xrateValue, Data</span><span class="hl opt">$</span><span class="hl std">caItemValue)</span>
+</pre></div>
+</div></div>
 
-<span class="hl com">##########################################################</span>
 
-<span class="hl com"># This plot is too basic, we want a better one. For this, we need a new package,</span>
+
+
+<h1 id="lecture6">Lecture 6</h1>
+
+<p>As in the case of the previous lecture, I provide you with the code beforehand. We will continue in the same script file that we used during Lecture 4 and 5. So just copy the below code and append it to this file.</p>
+
+<div class="chunk" id="unnamed-chunk-3"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">##########################################################</span>
+
+<span class="hl com"># The basline plot is too basic, we want a better one. For this, we need a new package,</span>
 <span class="hl com"># called ggplot2</span>
 <span class="hl com">#install.packages(&quot;ggplot2&quot;) #As usual, run this only once on any device</span>
 
@@ -1302,9 +1310,192 @@ all empty rows for the <code>item</code> column of the dataframe. In the above s
 <span class="hl kwd">summary</span><span class="hl std">(</span><span class="hl kwd">lm</span><span class="hl std">(xrateValue</span> <span class="hl opt">~</span> <span class="hl std">caItemValue, Data))</span>
 <span class="hl kwd">sink</span><span class="hl std">()</span>
 <span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;regOutput.txt&quot;</span><span class="hl std">)</span>
+
+
+
+<span class="hl com">########################################################</span>
+
+<span class="hl com"># Preparations for using RMarkdown</span>
+<span class="hl com">##################################</span>
+
+<span class="hl com"># This is how you save selected R objects putting them into a &quot;basket&quot; with </span>
+<span class="hl com"># a common name</span>
+<span class="hl kwd">save</span><span class="hl std">(aussen, devisenAgg,</span> <span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;dataForAnalysis.Rdata&quot;</span><span class="hl std">)</span>
 </pre></div>
 </div></div>
 
+
+<h2 id="lecture6_rmarkdown">R Markdown</h2>
+
+<p>An important goal of this lecture is also to introduce you to <code>R Markdown</code>. This is a powerful documentation tool that allows you to automate important parts of the documentation process. The idea is that if you change your sample (e.g. because you got a better idea about how to run your regression), you do not want each time to manually copy the regression results and graphics into, say, a MS Word document. Much better if everything ends up in a document automatically (I don't think you can disagree with that&hellip;).</p>
+
+<p>With R Markdown, you edit your document in the so-called markdown language and then compile it to either html, pdf, or MS Word format. We will look at this during class. Again, I prepared code and text beforehand, which you find below (R Markdown text/code is indicated by a reddish background, while R code is always indicated by a bluish background).</p>
+
+
+
+<pre style="margin-left:50px; padding:10px;
+background-color:#ffe6e6;"><code>
+
+
+---
+title: "Lecture 6 Introduction to R Markdown"
+author: "Johannes Binswanger"
+date: "March 31, 2016"
+output: html_document
+---
+
+One warning first. If you installed the German version of RStudio, then compilation to pdf will not work if the date reads something like `30. März 2016`. The problem is the period after `30`.
+
+Here is some code taken from Lecture 5.
+
+<!-- This here is my private comment, no one will see it ;-) -->
+
+
+```{r}
+
+load("dataForAnalysis.Rdata")
+xData = devisenAgg[devisenAgg$currency == "Euro per CHF", ]
+yData = aussen[aussen$caItem == "Ausfuhr" &
+               aussen$sector == "Total" &
+               aussen$measure == "Veränderung real", ]
+
+Data = merge(xData, yData, by = "timeID")
+
+names(Data)[names(Data) == "value.x"] = "xrateValue"
+
+names(Data)[names(Data) == "value.y"] = "caItemValue"
+
+
+```
+Below, we paste exactly the same code, but add the option `echo = FALSE`. So do you see anything?
+
+```{r, echo=FALSE}
+
+load("dataForAnalysis.Rdata")
+xData = devisenAgg[devisenAgg$currency == "Euro per CHF", ]
+yData = aussen[aussen$caItem == "Ausfuhr" &
+               aussen$sector == "Total" &
+               aussen$measure == "Veränderung real", ]
+
+Data = merge(xData, yData, by = "timeID")
+
+names(Data)[names(Data) == "value.x"] = "xrateValue"
+
+names(Data)[names(Data) == "value.y"] = "caItemValue"
+
+
+
+
+```
+
+
+```{r, echo=FALSE}
+
+library("ggplot2")
+
+ggplot(Data, aes(x = xrateValue, y = caItemValue)) +
+  geom_point(color = "red") +
+  geom_smooth(method = lm, color = "#66ffff", size = 1) +
+  xlab(unique(Data$currency)) +
+  ylab(paste(unique(Data$caItem), "-", unique(Data$sector), "-", unique(Data$measure))) +
+  ggtitle("Meine erste coole Graphik")
+
+```
+
+
+The regression results are:
+```{r, echo=FALSE}
+
+reg = lm(xrateValue ~ caItemValue, Data)
+
+summary(reg)
+
+```
+
+
+Maybe you like it better this way...
+lm(xrateValue ~ caItemValue, Data)
+
+```{r, echo=FALSE, comment="\t\t"}
+
+reg = lm(xrateValue ~ caItemValue, Data)
+
+summary(reg)
+
+```
+
+
+The regression object has the following elements:
+```{r, echo=FALSE}
+names(reg)
+```
+
+
+The coefficients are `r reg$coefficients`. This looks pretty ugly. Let's try to do it better...
+
+The coefficients of our regression models are:
+
+* The intercept is `r round(reg$coefficients[1], digits = 3)`.
+* The coefficient on `r paste(unique(Data$caItem), "-", unique(Data$sector), "-", unique(Data$measure))` is `r round(reg$coefficients[2], digits = 3)`.
+
+
+You can also put it in a nicer looking table:
+
+```{r, echo = FALSE}
+
+pvals = round(summary(reg)$coefficients[,4], digits = 3)
+
+```
+
+
+| Coefficient        | Point estimate           | p-value  |
+| ------------- |:-------------:| -----:|
+| Intercept | `r round(reg$coefficients[1], digits = 3)` | `r pvals[1]`|
+| Exports |`r round(reg$coefficients[2], digits = 3)`    |   `r pvals[2]` | 
+
+
+**If you rerun your regression models with different data, the coefficient is automatically adjusted.** Let's illustrate this by rerunning the regressions only with observations more from 2007 to 2015:
+
+```{r, echo=FALSE, comment="\t\t"}
+
+reg = lm(xrateValue ~ caItemValue, Data[Data$year>2006, ])
+
+
+
+```
+
+The coefficients of our regression models are now (With exactly the same lines of R Markdown code):
+
+* The intercept is `r round(reg$coefficients[1], digits = 3)`.
+* The coefficient on `r paste(unique(Data$caItem), "-", unique(Data$sector), "-", unique(Data$measure))` is `r round(reg$coefficients[2], digits = 3)`.
+
+You can also put it in a nicer looking table:
+
+```{r, echo = FALSE}
+
+pvals = round(summary(reg)$coefficients[,4], digits = 3)
+
+```
+
+
+| Coefficient        | Point estimate           | p-value  |
+| ------------- |:-------------:| -----:|
+| Intercept | `r round(reg$coefficients[1], digits = 3)` | `r pvals[1]`|
+| Exports |`r round(reg$coefficients[2], digits = 3)`    |   `r pvals[2]` | 
+
+
+
+*Even equations are possible:*
+
+$$\int_{-\infty}^{\infty}xf(x)dx= 1$$.
+
+And even colors: <span style = color:blue>Pretty cool</span> <span style = color:red>indeed!</span> But colors only work when compiling to html, not to pdf or MS Word.
+
+
+
+
+
+</code></pre>
 
 
 </div> <!-- end of div scriptText -->
