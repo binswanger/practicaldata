@@ -1344,7 +1344,7 @@ date: "March 31, 2016"
 output: html_document
 ---
 
-One warning first. If you installed the German version of RStudio, then compilation to pdf will not work if the date reads something like `30. März 2016`. The problem is the period after `30`.
+One warning first. If you use a German date format in the header with a period after the number, like "31. März 2016", then the compilation to pdf will not work.
 
 Here is some code taken from Lecture 5.
 
@@ -1414,10 +1414,11 @@ summary(reg)
 
 
 Maybe you like it better this way...
-lm(xrateValue ~ caItemValue, Data)
+
 
 ```{r, echo=FALSE, comment="\t\t"}
 
+lm(xrateValue ~ caItemValue, Data)
 reg = lm(xrateValue ~ caItemValue, Data)
 
 summary(reg)
@@ -1454,7 +1455,7 @@ pvals = round(summary(reg)$coefficients[,4], digits = 3)
 | Exports |`r round(reg$coefficients[2], digits = 3)`    |   `r pvals[2]` | 
 
 
-**If you rerun your regression models with different data, the coefficient is automatically adjusted.** Let's illustrate this by rerunning the regressions only with observations more from 2007 to 2015:
+**If you rerun your regression models with different data, the coefficients are automatically adjusted.** Let's illustrate this by rerunning the regressions only with observations more from 2007 to 2015:
 
 ```{r, echo=FALSE, comment="\t\t"}
 
@@ -1469,7 +1470,7 @@ The coefficients of our regression models are now (With exactly the same lines o
 * The intercept is `r round(reg$coefficients[1], digits = 3)`.
 * The coefficient on `r paste(unique(Data$caItem), "-", unique(Data$sector), "-", unique(Data$measure))` is `r round(reg$coefficients[2], digits = 3)`.
 
-You can also put it in a nicer looking table:
+And the table is now:
 
 ```{r, echo = FALSE}
 
@@ -1488,10 +1489,6 @@ pvals = round(summary(reg)$coefficients[,4], digits = 3)
 *Even equations are possible:*
 
 $$\int_{-\infty}^{\infty}xf(x)dx= 1$$.
-
-And even colors: <span style = color:blue>Pretty cool</span> <span style = color:red>indeed!</span> But colors only work when compiling to html, not to pdf or MS Word.
-
-
 
 
 
