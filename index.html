@@ -1505,6 +1505,398 @@ $$\int_{-\infty}^{\infty}xf(x)dx= 1$$.
 </code></pre>
 
 
+
+
+<h1 id="lecture7_8">Lectures 7 and 8</h1>
+
+<p>You've got already a pretty good overview of what R is able to do for preparing data sets and analyzing and visualizing them. In the remaining two lectures, we discuss a few important topics that we have not dealt with so far. These are:
+<ul>
+<li>Converting data sets from <i>long</i> to <i>wide</i> format and back (using the functions <code>dcast</code> and <code>melt</code> of the <code>reshape2</code> package);
+<li>Calculating growth rates and lagged values of variables (very important in economics);
+<li>Functions.
+</ul>
+</p>
+
+<p>As in the previous lectures, I will provide you with the code beforehand. We'll discuss and run it together in class. It's lots of code, hopefully we'll have time for all of it. If not, you can always run it on your own. Note: You will need the <code>rdata</code> object <code>dataForAnalysis</code> that we built at the end of Lecture 6. Make sure you know in which directory you have it, and have it ready!</p>
+
+<p>And here we go &hellip; I already placed many comments.</p>
+
+<div class="chunk" id="unnamed-chunk-4"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">###########################</span>
+<span class="hl com">#### Code <span class="hl kwa">for</span> LECTURE 7 ###</span>
+<span class="hl com">###########################</span>
+
+# Topics <span class="hl kwa">for</span> <span class="hl kwd">this</span> (and the <span class="hl kwa">next</span>) lecture:
+# - convert data formats from <span class="hl str">'long'</span> to <span class="hl str">'wide'</span> and vice versa
+<span class="hl com"># - calculate gowth rates and lags</span>
+<span class="hl com"># - functions</span>
+
+
+<span class="hl com"># To begin with, we copy a few lines of pevious code.</span>
+<span class="hl com"># Take the first lines of code that we copied</span>
+# into the RMarkdown <span class="hl kwd">file</span> (which you find <span class="hl kwa">in</span> the
+# online script under Lecture 6 and the heading <span class="hl str">&quot;R Markdown&quot;</span>),
+# the first chunk of <span class="hl str">'real'</span> code from he section with the reddish
+<span class="hl com"># background. </span>
+
+
+<span class="hl com"># And do not forget to add two more things:</span>
+<span class="hl com"># (1) Your working directory</span>
+<span class="hl com"># (2) a clean-up line, so we can</span>
+<span class="hl com">#     rerun the code whenever we wich without having to worry</span>
+<span class="hl com">#     about things gettung messed up</span>
+
+<span class="hl kwd">rm</span>(list = <span class="hl kwd">ls</span>()) # Clean-up line
+
+<span class="hl com"># Working directory</span>
+<span class="hl com"># !!! REPLACE THIS WITH WHAT FITS IN YOUR SITUATION !!!</span>
+<span class="hl kwd">setwd</span>(<span class="hl str">&quot;~/Desktop/MacWork/Programmieren für Praxis/KursLiveMac&quot;</span>) 
+<span class="hl kwd">setwd</span>(<span class="hl str">&quot;D:/Dropbox/Mac&amp;Surf/KursLiveDropb&quot;</span>)
+
+<span class="hl kwd">load</span>(<span class="hl str">&quot;dataForAnalysis.Rdata&quot;</span>)
+
+<span class="hl com"># So now we are ready <span class="hl kwa">for</span> new things...</span>
+
+<span class="hl com"># SWITCHING BETWEEN LONG AND WIDE FORMAT</span>
+<span class="hl com">########################################</span>
+
+<span class="hl com"># Have a look at the dataframe devisenAgg.</span>
+# It<span class="hl str">'s <span class="hl kwa">in</span> '</span>long<span class="hl str">' format. All '</span>variables' <span class="hl kwa">in</span> the 
+# statstical <span class="hl kwd">sense</span> (not the programming sense) are
+# stacked <span class="hl kwd">vertically</span> (the different exchange rates).
+# We want a <span class="hl str">'lazy'</span> method to convert this into the
+# <span class="hl str">'wide'</span> format. So it will look like you are used to.
+
+<span class="hl com"># we first need a package: reshape 2</span>
+# <span class="hl kwd">install.packages</span>(<span class="hl str">&quot;reshape2&quot;</span>)
+<span class="hl kwd">library</span>(reshape2)
+
+<span class="hl com"># From long to wide, you use the dcast <span class="hl kwa">function</span>.</span>
+<span class="hl com"># Althougn very powerful, it is a bit tricky to understand</span>
+<span class="hl com"># Normally, you will experiment a few times before you </span>
+<span class="hl com"># have what you want.</span>
+
+<span class="hl com"># You can find a good introduction to the functions of reshape2 on</span>
+<span class="hl com"># http://seananderson.ca/2013/10/19/reshape.html</span>
+
+
+
+Wide = <span class="hl kwd">dcast</span>(devisenAgg, # the data frame
+                    timeID ~ <span class="hl com"># the variable that is to</span>
+                             # <span class="hl str">'IDENTIFY'</span> ROWS of new
+                             # variables! Note the <span class="hl str">'~'</span>!
+                      currency , <span class="hl com"># the column containing </span>
+                                 <span class="hl com"># what you want to become</span>
+                                 <span class="hl com"># the new variable NAMES </span>
+        value.var = <span class="hl str">&quot;value&quot;</span>)  # column that contains the 
+                            <span class="hl com"># VALUES of the new variables</span>
+                            <span class="hl com"># (often, you can ommit this)</span>
+                                
+<span class="hl com"># This shortcut version also often works</span>
+Wide1 = <span class="hl kwd">dcast</span>(devisenAgg, timeID ~ currency)
+
+# Note, the column <span class="hl str">'currency'</span> disappeared. 
+<span class="hl com"># It served as source <span class="hl kwa">for</span> the new variable names!</span>
+
+<span class="hl com"># Note that the new variable names have spaces, </span>
+<span class="hl com"># so we cannot refer to them <span class="hl kwa">in</span> the usual way</span>
+
+<span class="hl kwd">summary</span>(Wide$Euro per CHF) # Does not work
+
+<span class="hl com"># But this works:</span>
+<span class="hl kwd">summary</span>(Wide$`Euro per CHF`)
+
+<span class="hl kwd">summary</span>(devisenWide[[<span class="hl str">&quot;Euro per CHF&quot;</span>]])
+
+<span class="hl com"># To learn about cast, see what other arrangements do</span>
+
+<span class="hl com"># Invert order</span>
+test = <span class="hl kwd">dcast</span>(devisenAgg, currency ~ timeID)
+<span class="hl kwd">names</span>(test)
+
+test = <span class="hl kwd">dcast</span>(devisenAgg, timeID ~ value)
+
+test = <span class="hl kwd">dcast</span>(devisenAgg, value ~ currency)
+
+<span class="hl com"># All not very useful...</span>
+
+
+<span class="hl com"># Now let's invert this, from wide to long</span>
+
+Melt = <span class="hl kwd">melt</span>(Wide, id.vars = <span class="hl str">&quot;timeID&quot;</span>)
+<span class="hl com"># Note, the id.vars indicates the variable that</span>
+<span class="hl com"># identified the rows <span class="hl kwa">in</span> the wide format</span>
+
+
+<span class="hl com">############################################################</span>
+
+<span class="hl com"># Now let's look at something more complicated:</span>
+# The <span class="hl str">'aussen'</span> dataframe
+
+<span class="hl com"># Clean up first</span>
+<span class="hl kwd">rm</span>(Wide, Wide1, test, Melt)
+
+<span class="hl com"># Now we will have more than one variable</span>
+<span class="hl com"># to define new variables!</span>
+
+
+Wide = <span class="hl kwd">dcast</span>(aussen, 
+              timeID  ~
+                caItem + sector + measure,
+              value.var = <span class="hl str">&quot;value&quot;</span>)
+
+<span class="hl com"># If you are bothered by the upper-case <span class="hl kwa">letters</span> use</span>
+
+<span class="hl kwd"><span class="hl kwa">for</span></span> (i <span class="hl kwa">in</span> 1:<span class="hl kwd">length</span>(<span class="hl kwd">names</span>(Wide))){
+  <span class="hl kwd">names</span>(Wide)[i] = <span class="hl kwd">tolower</span>(<span class="hl kwd">names</span>(Wide)[i])
+}
+
+<span class="hl com"># If you want to manipulate the names further,</span>
+# e.g. by removing the <span class="hl str">'_'</span> or spaces,
+# use the stringr <span class="hl kwd">packes</span> (which we have already used)
+<span class="hl com"># We will do so below.</span>
+
+
+# To make a <span class="hl str">'codebook'</span> use
+<span class="hl kwd">sink</span>(<span class="hl str">&quot;Codebook.txt&quot;</span>)
+<span class="hl kwd">cat</span>(<span class="hl kwd">toupper</span>(<span class="hl str">&quot;\nThe variables <span class="hl kwa">in</span> the <span class="hl str">'Wide'</span> data set are:\n\n&quot;</span>))
+
+<span class="hl kwd"><span class="hl kwa">for</span></span> (i <span class="hl kwa">in</span> 1:<span class="hl kwd">length</span>(<span class="hl kwd">names</span>(Wide))){
+  <span class="hl kwd">cat</span>(<span class="hl str">&quot;[&quot;</span>, i, <span class="hl str">&quot;]&quot;</span>, <span class="hl str">&quot;\t&quot;</span>, <span class="hl kwd">names</span>(Wide)[i],  <span class="hl str">&quot;\n\n&quot;</span>, sep=<span class="hl str">&quot;&quot;</span>)
+}
+<span class="hl kwd">sink</span>()
+#<span class="hl kwd">file.show</span>(<span class="hl str">&quot;Codebook.txt&quot;</span>)
+
+<span class="hl com"># Back to dcast...</span>
+<span class="hl com">###################</span>
+
+<span class="hl com">#You can also have multiple variables on the </span>
+<span class="hl com"># row identification side</span>
+
+Wide1 = <span class="hl kwd">dcast</span>(aussen, 
+             year + quarter  ~
+               caItem + sector + measure,
+             value.var = <span class="hl str">&quot;value&quot;</span>)
+
+
+<span class="hl com"># And now melt</span>
+
+Melt = <span class="hl kwd">melt</span>(Wide, id.vars = <span class="hl str">&quot;timeid&quot;</span>)
+
+<span class="hl com"># And with multiple id variables:</span>
+Melt1 = <span class="hl kwd">melt</span>(Wide1, id.vars = <span class="hl kwd">c</span>(<span class="hl str">&quot;year&quot;</span>, <span class="hl str">&quot;quarter&quot;</span>))
+
+<span class="hl com">#################################################################################</span>
+
+<span class="hl com"># GROWTH RATES AND LAGS</span>
+<span class="hl com">#######################</span>
+
+<span class="hl com"># We have already looked at how CHF/Euro-exchange rates are associated</span>
+<span class="hl com"># with changes <span class="hl kwa">in</span> exports. However, is it really the LEVELS of exchange</span>
+<span class="hl com"># rates that affect changes <span class="hl kwa">in</span> exports? Maybe it's rather the CHANGES</span>
+<span class="hl com"># <span class="hl kwa">in</span> exchange rates? We got the changes <span class="hl kwa">in</span> exports directly from the SNB data.</span>
+<span class="hl com"># But we have to calculate the changes <span class="hl kwa">in</span> exchange rates ourselves... How?</span>
+
+<span class="hl com"># To get the idea, look at the following</span>
+x = 1:10
+
+<span class="hl kwd">tail</span>(x, -1)
+<span class="hl kwd">head</span>(x, -1)
+
+gx = (  <span class="hl kwd">tail</span>(x, -1) / <span class="hl kwd">head</span>(x, -1) 
+      - 1)*100 <span class="hl com">#convert to percentage values</span>
+
+
+<span class="hl com"># We can use the very same trick <span class="hl kwa">for</span> lags, <span class="hl kwa">in</span> fact, we already have the solution.</span>
+<span class="hl com"># But why lags? Well, it may take some time before exchanges rates affect exports</span>
+<span class="hl com"># Existing projects will not just be cancelled on January 16 2015. Probably most contracts</span>
+<span class="hl com"># Prevent businesses from doing so. But there may be less NEW contracts</span>
+<span class="hl com"># To get this effect statistically, you need LAGS.</span>
+
+<span class="hl com"># It's done like so:</span>
+lx = <span class="hl kwd">head</span>(x, -1)
+<span class="hl com"># But this is shorter than x, so it would not fit into a </span>
+<span class="hl com"># dataframe where all variables need to have the same length.</span>
+<span class="hl com"># Here is the solution</span>
+
+lx = <span class="hl kwd">c</span>(<span class="hl kwa">NA</span>, <span class="hl kwd">head</span>(x, -1))
+
+<span class="hl com"># and we'll actually have to do the same <span class="hl kwa">for</span> growth rates</span>
+<span class="hl com"># Add a missing first value</span>
+gx = <span class="hl kwd">c</span>(<span class="hl kwa">NA</span>, gx)
+
+
+xData = <span class="hl kwd">cbind</span>(x, lx, gx)
+
+
+<span class="hl com"># Digression: Functions</span>
+<span class="hl com">#######################</span>
+
+<span class="hl com"># It is time to get familiar with fuctions. Functions </span>
+# <span class="hl str">'outsource'</span> bits of code that you need quite often
+<span class="hl com"># but do not want to type every time you need it.</span>
+<span class="hl com"># This is also smart. If you make a mistake, you just correct</span>
+<span class="hl com"># it once  instead of searching through an entire document of a</span>
+<span class="hl com"># thousand lines of code where you repeated the same chunk about 31</span>
+<span class="hl com"># times. Moreover, and maybe even more important, functions can have</span>
+<span class="hl com"># arguments that VARY!</span>
+
+<span class="hl com"># When you become better at programming and write more complex programs</span>
+<span class="hl com"># you will use functions more and more. At the beginning they seem to </span>
+<span class="hl com"># make code more dense and opague. But eventually you will greatly appreciate.</span>
+<span class="hl com"># At some point <span class="hl kwa">if</span> you want to become a good programmer, you make it a habit</span>
+# to convert many pieces of code into a <span class="hl kwa">function</span>. So you get this <span class="hl str">'into your fingers'</span>.
+
+
+<span class="hl com"># Calculating lags is used quite often. And you may need various lags,</span>
+<span class="hl com"># As you don't know how long it takes <span class="hl kwa">for</span> a variable to have an effect!</span>
+
+<span class="hl com"># Give functions a name that easily indicates what they are</span>
+<span class="hl com"># doing and that indicate that it's a <span class="hl kwa">function</span>.</span>
+# Use <span class="hl str">&quot;to&quot;</span>, <span class="hl str">&quot;get&quot;</span>, or <span class="hl str">&quot;_fun&quot;</span> etc.
+toLag = <span class="hl kwd"><span class="hl kwa">function</span></span>(var, lag) {
+  out = <span class="hl kwd">c</span>(<span class="hl kwd">rep</span>(<span class="hl kwa">NA</span>, lag), <span class="hl kwd">head</span>(var, -lag))
+}
+
+y = <span class="hl kwd">toLag</span>(1:10, 2)
+y
+
+<span class="hl com"># Let's also get a first idea of what is</span>
+<span class="hl com"># called the SCOPE of a variable</span>
+<span class="hl com"># We just used the <span class="hl kwa">function</span> toLag, so R calculated the variable</span>
+<span class="hl com"># out. Let's see:</span>
+
+out  <span class="hl com"># Why does R not know it??</span>
+
+<span class="hl com"># out is known to R only inside the <span class="hl kwa">function</span>, i.e. inside the </span>
+# <span class="hl str">'{}'</span> of the <span class="hl kwa">function</span>. This is the SCOPE of that variable!
+
+
+<span class="hl com"># Another <span class="hl kwa">function</span></span>
+
+toGrowth = <span class="hl kwd"><span class="hl kwa">function</span></span>(x) {
+  out = ( <span class="hl kwd">tail</span>(x, -1) / <span class="hl kwd">head</span>(x, -1)
+          -1)*100
+  out = <span class="hl kwd">c</span>(<span class="hl kwa">NA</span>, out)
+}
+
+
+<span class="hl com">#######################################################################################</span>
+
+<span class="hl com"># Calculating growth rates and lags <span class="hl kwa">for</span> our data</span>
+<span class="hl com">################################################</span>
+
+<span class="hl com">#Let's again practice the reshaping of data and merging them</span>
+
+xData = <span class="hl kwd">dcast</span>(devisenAgg, timeID ~ currency, value.var = <span class="hl str">&quot;value&quot;</span>)
+
+yData = <span class="hl kwd">dcast</span>(aussen, timeID ~ caItem +  sector + measure, value.var = <span class="hl str">&quot;value&quot;</span>)
+
+mainData = <span class="hl kwd">merge</span>(xData, yData, by = <span class="hl str">&quot;timeID&quot;</span>)
+
+# Correct column <span class="hl kwd">names</span> (exchange rates are the wrong way around!!!)
+<span class="hl com"># And let's see how cool utf-8 coding is!!!</span>
+
+<span class="hl kwd">names</span>(mainData)[<span class="hl kwd">names</span>(mainData) == <span class="hl str">&quot;Euro per CHF&quot;</span>] = <span class="hl str">&quot;CHF pro \u20ac&quot;</span>
+<span class="hl kwd">names</span>(mainData)[<span class="hl kwd">names</span>(mainData) == <span class="hl str">&quot;USD per CHF&quot;</span>] = <span class="hl str">&quot;CHF pro \u0024&quot;</span>
+<span class="hl kwd">names</span>(mainData)[<span class="hl kwd">names</span>(mainData) == <span class="hl str">&quot;GBP per CHF&quot;</span>] = <span class="hl str">&quot;CHF pro \u00a3&quot;</span>
+
+
+<span class="hl com"># Calculate growth rates <span class="hl kwa">for</span> exchange rates</span>
+mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u20ac</span> (Ver\u00e4nderung)&quot;</span>]] = <span class="hl kwd">toGrowth</span>(mainData[[<span class="hl str">&quot;CHF pro \u20ac&quot;</span>]])
+
+mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u0024</span> (Ver\u00e4nderung)&quot;</span>]] = <span class="hl kwd">toGrowth</span>(mainData[[<span class="hl str">&quot;CHF pro \u0024&quot;</span>]])
+
+mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u00a3</span> (Ver\u00e4nderung)&quot;</span>]] = <span class="hl kwd">toGrowth</span>(mainData[[<span class="hl str">&quot;CHF pro \u00a3&quot;</span>]])
+
+<span class="hl com"># And a lag</span>
+
+lag = 1
+
+mainData[[<span class="hl kwd">paste0</span>(<span class="hl str">&quot;CHF pro <span class="hl kwd">\u20ac</span> (Ver\u00e4nderung, Lag: &quot;</span>, lag, <span class="hl str">&quot; <span class="hl kwd">Quartal</span>(e))&quot;</span>)]] = 
+    <span class="hl kwd">toLag</span>(mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u20ac</span> (Ver\u00e4nderung)&quot;</span>]], lag)
+
+mainData[[<span class="hl kwd">paste0</span>(<span class="hl str">&quot;CHF pro <span class="hl kwd">\u0024</span> (Ver\u00e4nderung, Lag: &quot;</span>, lag, <span class="hl str">&quot; <span class="hl kwd">Quartal</span>(e))&quot;</span>)]] = 
+  <span class="hl kwd">toLag</span>(mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u0024</span> (Ver\u00e4nderung)&quot;</span>]], lag)
+
+mainData[[<span class="hl kwd">paste0</span>(<span class="hl str">&quot;CHF pro <span class="hl kwd">\u00a3</span> (Ver\u00e4nderung, Lag: &quot;</span>, lag, <span class="hl str">&quot; <span class="hl kwd">Quartal</span>(e))&quot;</span>)]] = 
+  <span class="hl kwd">toLag</span>(mainData[[<span class="hl str">&quot;CHF pro <span class="hl kwd">\u00a3</span> (Ver\u00e4nderung)&quot;</span>]], lag)
+
+
+<span class="hl com"># Relocate this block of new variables</span>
+
+mainData = mainData[, <span class="hl kwd">c</span>(<span class="hl kwd">names</span>(mainData[1:4]),
+             <span class="hl kwd">names</span>(mainData[24:29]),
+             <span class="hl kwd">names</span>(mainData[5:23])
+             )]
+<span class="hl com"># If you want to change lags, all you have to do is to reset the lag </span>
+<span class="hl com"># value above, just one number to retype!!! All the rest will be</span>
+<span class="hl com"># done automatically, including renaming of variables!!!</span>
+
+
+# Make variable names nicer by removing <span class="hl str">'_'</span>
+
+<span class="hl kwd">library</span>(stringr)
+
+<span class="hl com"># To see the idea, it's extremely easy!</span>
+
+x = <span class="hl str">&quot;this_and_that&quot;</span>
+<span class="hl kwd">str_replace_all</span>(x, <span class="hl str">&quot;_&quot;</span>, <span class="hl str">&quot; &quot;</span>)
+
+<span class="hl com"># Now the real thing</span>
+<span class="hl kwd">names</span>(mainData) = <span class="hl kwd">str_replace_all</span>(<span class="hl kwd">names</span>(mainData), <span class="hl str">&quot;_&quot;</span>, <span class="hl str">&quot; &quot;</span>)
+
+
+
+<span class="hl com"># Time to visualize the data and to run regressions!</span>
+<span class="hl com">####################################################</span>
+
+<span class="hl com"># We previously used ggplot. However, that package is not</span>
+<span class="hl com"># good at handling variable names with spaces and utf-8 characters</span>
+<span class="hl com"># On the other hand, I like these variable names since I can directly</span>
+<span class="hl com"># use it <span class="hl kwa">for</span> getting nice legends and axis labels without having</span>
+<span class="hl com"># to convert ugly variable names like xRateEuroCHF etc.</span>
+
+<span class="hl com"># So we use the base version of plots. This is a bit more involved</span>
+<span class="hl com"># than ggplot when you really want to make nice graphs. But why not</span>
+<span class="hl com"># have a look at it. Personally, I really like it.</span>
+
+xvar =<span class="hl kwd">paste0</span>(<span class="hl str">&quot;CHF pro <span class="hl kwd">\u20ac</span> (Ver\u00e4nderung, Lag: &quot;</span>, lag, <span class="hl str">&quot; <span class="hl kwd">Quartal</span>(e))&quot;</span>)
+yvar = <span class="hl str">&quot;Ausfuhr Total Veränderung real&quot;</span>
+col1 = <span class="hl str">&quot;#009999&quot;</span>
+col2 = <span class="hl str">&quot;red3&quot;</span>
+
+<span class="hl kwd">png</span>(<span class="hl str">&quot;myPlot.png&quot;</span>, width = 800, height = 550)
+<span class="hl kwd">plot</span>( mainData[[xvar]], mainData[[yvar]], 
+     xlab=xvar, ylab=yvar,
+     pch = 19, col = col1,
+     main = <span class="hl kwd">paste</span>(yvar, <span class="hl str">&quot;und\n&quot;</span>, xvar))
+<span class="hl kwd">grid</span>()
+
+<span class="hl kwd">abline</span>(<span class="hl kwd">lm</span>(mainData[[yvar]]~mainData[[xvar]]), col=col2, lwd = 3) 
+
+reg = <span class="hl kwd">lm</span>(mainData[[yvar]]~mainData[[xvar]])
+sumreg = <span class="hl kwd">summary</span>(reg)
+r2 = <span class="hl kwd">round</span>(sumreg$r.squared, digits = 3)
+slope = <span class="hl kwd">round</span>(sumreg$coefficients[2,1], digits = 3)
+pval = <span class="hl kwd">round</span>(sumreg$coefficients[2,4], digits = 3)
+
+
+comment1 &lt;- <span class="hl kwd">bquote</span>(Koeffizient == <span class="hl kwd">.</span>(slope))
+comment2 &lt;- <span class="hl kwd">bquote</span>(R^2 == <span class="hl kwd">.</span>(r2))
+comment3 &lt;- <span class="hl kwd">bquote</span>(p == <span class="hl kwd">.</span>(pval))
+
+<span class="hl kwd">text</span>(-0,-10, comment1, cex = 1, col = col2)
+<span class="hl kwd">text</span>(-0, -14, comment2, cex = 1, col = col2)
+<span class="hl kwd">text</span>(-0, -18, comment3, cex = 1, col = col2)
+
+<span class="hl kwd">dev.off</span>()
+<span class="hl kwd">file.show</span>(<span class="hl str">&quot;myPlot.png&quot;</span>)
+</pre></div>
+</div></div>
+
+
+
+
 </div> <!-- end of div scriptText -->
 
 
