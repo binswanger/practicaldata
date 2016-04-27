@@ -1507,7 +1507,7 @@ $$\int_{-\infty}^{\infty}xf(x)dx= 1$$.
 
 
 
-<h1 id="lecture7_8">Lectures 7 and 8</h1>
+<h1 id="lecture7">Lecture 7</h1>
 
 <p>You've got already a pretty good overview of what R is able to do for preparing data sets and analyzing and visualizing them. In the remaining two lectures, we discuss a few important topics that we have not dealt with so far. These are:
 <ul>
@@ -1517,7 +1517,7 @@ $$\int_{-\infty}^{\infty}xf(x)dx= 1$$.
 </ul>
 </p>
 
-<p>As in the previous lectures, I will provide you with the code beforehand. We'll discuss and run it together in class. It's lots of code, hopefully we'll have time for all of it. If not, you can always run it on your own. Note: You will need the <code>rdata</code> object <code>dataForAnalysis</code> that we built at the end of Lecture 6. Make sure you know in which directory you have it, and have it ready!</p>
+<p>As in the previous lectures, I will provide you with the code beforehand. We'll discuss and run it together in class. Note: You will need the <code>rdata</code> object <code>dataForAnalysis</code> that we built at the end of Lecture 6. Make sure you know in which directory you have it, and have it ready!</p>
 
 <p>And here we go &hellip; I already placed many comments.</p>
 
@@ -1896,6 +1896,450 @@ comment3 &lt;- <span class="hl kwd">bquote</span>(p == <span class="hl kwd">.</s
 
 
 
+
+
+
+<h1 id="lecture8">Lecture 8</h1>
+
+<p>In this lecture, we will dig deeper into functions and why they are so powerful. Demonstrating the full power of functions will be the culmination point and also the end of this course!</p>
+
+<p>Again, I prepared the code beforehand. There are four separate pieces of code. The first piece consists of typical sequential code as we have done it before. One thing is calculated after the other. The second piece rearranges the bits such that they resemble how they would appear in a function. In the third piece, we will finally define a function that is much more powerful than the ones you have seen so far. The fourth piece of code uses that function. </p>
+
+<p>Note that you will again need the <code>rdata</code> object <code>dataForAnalysis</code> that we built at the end of Lecture 6.</p>
+
+<p>Below is the first chunk of code, where we build a data set that is suitable for in-depth analysis of the relationship between exchange rates and current account balance items. We will then run regressions and build plots with the baseline plotting tools. Although <code>ggplot</code> is a powerful plotting tool, the baseline plots also have their special merits, as you will see.</p> 
+
+<p><b>Do not forget to change the working directory to what it should be in your case!</b></p>
+
+<div class="chunk" id="unnamed-chunk-5"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">#############################################################################</span>
+<span class="hl com"># Final steps for a solid analysis of the effect of exchange rates on exports</span>
+<span class="hl com">#############################################################################</span>
+
+
+<span class="hl kwd">library</span><span class="hl std">(reshape2)</span>
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">())</span>
+
+<span class="hl com"># !!! REPLACE THIS WITH WHAT FITS IN YOUR SITUATION !!!</span>
+<span class="hl com">#setwd(&quot;~/Desktop/MacWork/Programmieren für Praxis/KursLiveMac&quot;) </span>
+<span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">&quot;D:/Dropbox/Mac&amp;Surf/KursLiveDropb&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Like in Lecture 7</span>
+<span class="hl kwd">load</span><span class="hl std">(</span><span class="hl str">&quot;dataForAnalysis.Rdata&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># toLag function copied from Lecture 7, </span>
+<span class="hl com"># but new line added that works for lag = 0!!!</span>
+<span class="hl std">toLag</span> <span class="hl kwb">=</span> <span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">var</span><span class="hl std">,</span> <span class="hl kwc">lag</span><span class="hl std">) {</span>
+
+  <span class="hl kwa">if</span> <span class="hl std">(lag</span> <span class="hl opt">==</span> <span class="hl num">0</span><span class="hl std">){out</span> <span class="hl kwb">=</span> <span class="hl std">var }</span>
+
+  <span class="hl kwa">else</span> <span class="hl std">{ out</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl kwd">rep</span><span class="hl std">(</span><span class="hl num">NA</span><span class="hl std">, lag),</span> <span class="hl kwd">head</span><span class="hl std">(var,</span> <span class="hl opt">-</span><span class="hl std">lag))  }</span>
+<span class="hl std">}</span>
+
+<span class="hl com"># Check it out, would not have worked without the extra line</span>
+<span class="hl std">x</span> <span class="hl kwb">=</span> <span class="hl kwd">toLag</span><span class="hl std">(</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">10</span><span class="hl std">,</span><span class="hl num">0</span><span class="hl std">)</span>
+<span class="hl std">x</span>
+
+<span class="hl com"># Literally copied from Lecture 7</span>
+<span class="hl std">toGrowth</span> <span class="hl kwb">=</span> <span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">x</span><span class="hl std">) {</span>
+  <span class="hl std">out</span> <span class="hl kwb">=</span> <span class="hl std">(</span> <span class="hl kwd">tail</span><span class="hl std">(x,</span> <span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">)</span> <span class="hl opt">/</span> <span class="hl kwd">head</span><span class="hl std">(x,</span> <span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">)</span>
+          <span class="hl opt">-</span><span class="hl num">1</span><span class="hl std">)</span><span class="hl opt">*</span><span class="hl num">100</span>
+  <span class="hl std">out</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl num">NA</span><span class="hl std">, out)</span>
+<span class="hl std">}</span>
+
+
+<span class="hl com"># Preparing data for analysis</span>
+
+<span class="hl com"># Nothing new here</span>
+<span class="hl std">xData</span> <span class="hl kwb">=</span> <span class="hl kwd">dcast</span><span class="hl std">(devisenAgg, timeID</span> <span class="hl opt">~</span> <span class="hl std">currency,</span> <span class="hl kwc">value.var</span> <span class="hl std">=</span> <span class="hl str">&quot;value&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">yData</span> <span class="hl kwb">=</span> <span class="hl kwd">dcast</span><span class="hl std">(aussen, timeID</span> <span class="hl opt">~</span> <span class="hl std">caItem</span> <span class="hl opt">+</span>  <span class="hl std">sector</span> <span class="hl opt">+</span> <span class="hl std">measure,</span> <span class="hl kwc">value.var</span> <span class="hl std">=</span> <span class="hl str">&quot;value&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># And you have seen merge before as well</span>
+<span class="hl std">mainData</span> <span class="hl kwb">=</span> <span class="hl kwd">merge</span><span class="hl std">(xData, yData,</span> <span class="hl kwc">by</span> <span class="hl std">=</span> <span class="hl str">&quot;timeID&quot;</span><span class="hl std">)</span>
+
+
+<span class="hl com"># Make variable names nicer by removing '_'</span>
+
+<span class="hl kwd">library</span><span class="hl std">(stringr)</span>
+
+<span class="hl com"># To see the idea, it's extremely easy!</span>
+
+<span class="hl std">x</span> <span class="hl kwb">=</span> <span class="hl str">&quot;this_and_that&quot;</span>
+<span class="hl kwd">str_replace_all</span><span class="hl std">(x,</span> <span class="hl str">&quot;_&quot;</span><span class="hl std">,</span> <span class="hl str">&quot; &quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Now the real thing</span>
+<span class="hl kwd">names</span><span class="hl std">(mainData)</span> <span class="hl kwb">=</span> <span class="hl kwd">str_replace_all</span><span class="hl std">(</span><span class="hl kwd">names</span><span class="hl std">(mainData),</span> <span class="hl str">&quot;_&quot;</span><span class="hl std">,</span> <span class="hl str">&quot; &quot;</span><span class="hl std">)</span>
+
+
+
+<span class="hl com"># Correct column names (exchange rates are the wrong way around!!!)</span>
+
+
+<span class="hl kwd">names</span><span class="hl std">(mainData)[</span><span class="hl kwd">names</span><span class="hl std">(mainData)</span> <span class="hl opt">==</span> <span class="hl str">&quot;Euro per CHF&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;CHF pro Euro&quot;</span>
+<span class="hl kwd">names</span><span class="hl std">(mainData)[</span><span class="hl kwd">names</span><span class="hl std">(mainData)</span> <span class="hl opt">==</span> <span class="hl str">&quot;USD per CHF&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;CHF pro USD&quot;</span>
+<span class="hl kwd">names</span><span class="hl std">(mainData)[</span><span class="hl kwd">names</span><span class="hl std">(mainData)</span> <span class="hl opt">==</span> <span class="hl str">&quot;GBP per CHF&quot;</span><span class="hl std">]</span> <span class="hl kwb">=</span> <span class="hl str">&quot;CHF pro GBP&quot;</span>
+
+
+<span class="hl com"># Calculate growth rates for exchange rates</span>
+<span class="hl com"># And let's see how cool utf-8 coding is!!!</span>
+<span class="hl com"># Google it if you are curious what it exactly means</span>
+<span class="hl str">&quot;\u00e4&quot;</span>
+<span class="hl str">&quot;\u0025&quot;</span>
+<span class="hl std">mainData[[</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025)&quot;</span><span class="hl std">]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toGrowth</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro Euro&quot;</span><span class="hl std">]])</span>
+
+<span class="hl std">mainData[[</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toGrowth</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro USD&quot;</span><span class="hl std">]])</span>
+
+<span class="hl std">mainData[[</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toGrowth</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro GBP&quot;</span><span class="hl std">]])</span>
+
+<span class="hl com"># For later purposes</span>
+<span class="hl kwd">save</span><span class="hl std">(mainData,</span> <span class="hl kwc">file</span> <span class="hl std">=</span> <span class="hl str">&quot;dataForAnalysisMerged.RData&quot;</span><span class="hl std">)</span>
+
+
+<span class="hl com"># Add lags to exchange rates</span>
+<span class="hl com"># And give fancy variable names</span>
+<span class="hl com"># Well, names that come in handy for labels for plots</span>
+
+<span class="hl std">lag</span> <span class="hl kwb">=</span> <span class="hl num">1</span>
+
+<span class="hl std">mainData[[</span>  <span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">,</span>
+                 <span class="hl std">lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)  ]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+<span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">,</span>
+                 <span class="hl std">lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+<span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">,</span>
+                 <span class="hl std">lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+
+<span class="hl com"># Relocate this block of new variables</span>
+<span class="hl com"># (Just to show you that this is possible)</span>
+
+<span class="hl std">mainData</span> <span class="hl kwb">=</span> <span class="hl std">mainData[,</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl kwd">names</span><span class="hl std">(mainData[</span><span class="hl num">1</span><span class="hl opt">:</span><span class="hl num">4</span><span class="hl std">]),</span>
+                        <span class="hl kwd">names</span><span class="hl std">(mainData[</span><span class="hl num">24</span><span class="hl opt">:</span><span class="hl num">29</span><span class="hl std">]),</span>
+                        <span class="hl kwd">names</span><span class="hl std">(mainData[</span><span class="hl num">5</span><span class="hl opt">:</span><span class="hl num">23</span><span class="hl std">])</span>
+<span class="hl std">)]</span>
+<span class="hl com"># If you want to change lags, all you have to do is to reset the lag </span>
+<span class="hl com"># value above, just one number to retype!!! All the rest will be</span>
+<span class="hl com"># done automatically, including renaming of variables!!!</span>
+
+
+
+
+<span class="hl com"># Time to visualize the data and to run regressions!</span>
+<span class="hl com">####################################################</span>
+
+<span class="hl com"># We previously used ggplot. However, that package is not</span>
+<span class="hl com"># good at handling variable names with spaces and utf-8 characters</span>
+<span class="hl com"># On the other hand, I like these variable names since I can directly</span>
+<span class="hl com"># use it for getting nice legends and axis labels without having</span>
+<span class="hl com"># to convert ugly variable names like xRateEuroCHF etc.</span>
+
+<span class="hl com"># So we use the base version of plots. This is a bit more involved</span>
+<span class="hl com"># than ggplot when you really want to make nice graphs. But why not</span>
+<span class="hl com"># have a look at it. Personally, I really like it.</span>
+
+<span class="hl com"># On top of this, we will do magic with strings</span>
+<span class="hl std">xvar</span> <span class="hl kwb">=</span> <span class="hl str">&quot;CHF pro Euro&quot;</span>
+
+<span class="hl std">xvarAug</span> <span class="hl kwb">=</span> <span class="hl kwd">paste0</span><span class="hl std">(xvar,</span> <span class="hl str">&quot; (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)</span>
+
+
+<span class="hl std">yvar</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Ausfuhr Total Veränderung real&quot;</span>
+
+<span class="hl com">#Even colors can be variables, how cool!!</span>
+<span class="hl std">col1</span> <span class="hl kwb">=</span> <span class="hl str">&quot;#009999&quot;</span>
+<span class="hl std">col2</span> <span class="hl kwb">=</span> <span class="hl str">&quot;red3&quot;</span>
+
+
+<span class="hl kwd">plot</span><span class="hl std">( mainData[[xvarAug]], mainData[[yvar]],</span>
+                    <span class="hl com"># x and y variables for plot</span>
+      <span class="hl kwc">xlab</span><span class="hl std">=xvarAug,</span> <span class="hl kwc">ylab</span><span class="hl std">=yvar,</span> <span class="hl com"># x and y labels</span>
+      <span class="hl kwc">pch</span> <span class="hl std">=</span> <span class="hl num">19</span><span class="hl std">,</span>
+          <span class="hl com"># pch specifies dots as symbols, see</span>
+          <span class="hl com"># http://www.endmemo.com/program/R/pchsymbols.php</span>
+      <span class="hl kwc">col</span> <span class="hl std">= col1,</span> <span class="hl com"># color of dots</span>
+      <span class="hl kwc">main</span> <span class="hl std">=</span> <span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">&quot;Zusammenhang zwischen Handelsbilanzpositionen und Wechselkursen&quot;</span><span class="hl std">))</span>
+                  <span class="hl com"># You have seen this already</span>
+<span class="hl kwd">grid</span><span class="hl std">()</span> <span class="hl com"># Add gridlines you can leave this out if you like</span>
+
+<span class="hl kwd">abline</span><span class="hl std">(</span> <span class="hl com"># add straight line that fits data...</span>
+  <span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]]),</span> <span class="hl com"># ...in fact, a regression line...</span>
+  <span class="hl kwc">col</span><span class="hl std">=col2,</span> <span class="hl com"># ...with this color</span>
+  <span class="hl kwc">lwd</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span> <span class="hl com"># line thickness (&quot;width&quot;)</span>
+
+<span class="hl std">reg</span> <span class="hl kwb">=</span> <span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]])</span>
+  <span class="hl com"># calculate linear regression for getting numbers</span>
+
+<span class="hl std">sumreg</span> <span class="hl kwb">=</span> <span class="hl kwd">summary</span><span class="hl std">(reg)</span>  <span class="hl com"># get full regression output</span>
+
+<span class="hl std">r2</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">r.squared,</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span> <span class="hl com"># get r squared, rounded to 3 digits</span>
+
+<span class="hl std">slope</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+    <span class="hl com"># get x-coefficient</span>
+
+<span class="hl std">pval</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">4</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+    <span class="hl com"># get pvalue of x-coefficient</span>
+
+<span class="hl com"># Now let's add a comment line for each of these numbers </span>
+<span class="hl com"># Do not get confused, it's just so you have seen this is possible</span>
+<span class="hl com"># The next three lines save the comments as variables</span>
+<span class="hl std">comment1</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(Koeffizient</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(slope))</span>
+<span class="hl std">comment2</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(R</span><span class="hl opt">^</span><span class="hl num">2</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(r2))</span>
+<span class="hl std">comment3</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(p</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(pval))</span>
+
+<span class="hl com"># Now lets post it into the plot</span>
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span>   <span class="hl com"># x position (in units of x axis)</span>
+     <span class="hl opt">-</span><span class="hl num">10</span><span class="hl std">,</span> <span class="hl com"># y position (in units of y axis)</span>
+     <span class="hl std">comment1,</span> <span class="hl com"># the text to be shown</span>
+     <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl com"># size of font, 1 is default, check out 5 if you are curious</span>
+     <span class="hl kwc">col</span> <span class="hl std">= col2)</span>  <span class="hl com"># the color (here red)</span>
+
+
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">14</span><span class="hl std">, comment2,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span> <span class="hl com"># the r squared</span>
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">18</span><span class="hl std">, comment3,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span> <span class="hl com"># the p value</span>
+</pre></div>
+</div></div>
+
+
+<p>Below, you find basically the same code, just that the bits and pieces are partially rearranged. This allows you to better understand how to get from linear one-thing-after-the-other code to function code. For details, see the comments in the code.</p>
+
+<div class="chunk" id="unnamed-chunk-6"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com"># In this script we do almost exactly the same as in the previous one</span>
+<span class="hl com"># except that we directly start with loading dataForAnalysisMerged.RData</span>
+
+<span class="hl com"># There are some other changes.</span>
+<span class="hl com"># We functionally rearrange code</span>
+<span class="hl com"># Why? Because we want to make a function out of the </span>
+<span class="hl com"># entire thing. You will see why this is pretty cool</span>
+
+<span class="hl com"># There is NO SINGLE PIECE OF NEW CODE HERE!!</span>
+<span class="hl com"># You find everything in the previous script!</span>
+
+<span class="hl com"># Clean-up, in case there is some garbage from previous work</span>
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">())</span>
+
+<span class="hl com"># Put here what will become the arguments of a function</span>
+<span class="hl std">xvar</span> <span class="hl kwb">=</span> <span class="hl str">&quot;CHF pro Euro&quot;</span>
+<span class="hl std">yvar</span> <span class="hl kwb">=</span> <span class="hl str">&quot;Ausfuhr Total Veränderung real&quot;</span>
+<span class="hl std">lag</span> <span class="hl kwb">=</span> <span class="hl num">6</span>
+
+
+
+<span class="hl com"># All libraries</span>
+<span class="hl kwd">library</span><span class="hl std">(reshape2)</span>
+<span class="hl kwd">library</span><span class="hl std">(stringr)</span>
+
+
+<span class="hl com"># Working directory</span>
+<span class="hl com"># !!! REPLACE THIS WITH WHAT FITS IN YOUR SITUATION !!!</span>
+<span class="hl com">#setwd(&quot;~/Desktop/MacWork/Programmieren für Praxis/KursLiveMac&quot;) </span>
+<span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">&quot;D:/Dropbox/Mac&amp;Surf/KursLiveDropb&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Load data (now mainData.Rdata)</span>
+<span class="hl kwd">load</span><span class="hl std">(</span><span class="hl str">&quot;dataForAnalysisMerged.RData&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># functions</span>
+<span class="hl std">toLag</span> <span class="hl kwb">=</span> <span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">var</span><span class="hl std">,</span> <span class="hl kwc">lag</span><span class="hl std">) {</span>
+
+  <span class="hl kwa">if</span> <span class="hl std">(lag</span> <span class="hl opt">==</span> <span class="hl num">0</span><span class="hl std">){out</span> <span class="hl kwb">=</span> <span class="hl std">var }</span>
+
+  <span class="hl kwa">else</span> <span class="hl std">{ out</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl kwd">rep</span><span class="hl std">(</span><span class="hl num">NA</span><span class="hl std">, lag),</span> <span class="hl kwd">head</span><span class="hl std">(var,</span> <span class="hl opt">-</span><span class="hl std">lag))  }</span>
+<span class="hl std">}</span>
+
+
+
+
+<span class="hl com"># Plotting and regressions</span>
+<span class="hl std">xvarAug</span> <span class="hl kwb">=</span> <span class="hl kwd">paste0</span><span class="hl std">(xvar,</span> <span class="hl str">&quot; (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">col1</span> <span class="hl kwb">=</span> <span class="hl str">&quot;#009999&quot;</span>
+<span class="hl std">col2</span> <span class="hl kwb">=</span> <span class="hl str">&quot;red3&quot;</span>
+
+<span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+<span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+<span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+  <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+
+
+<span class="hl kwd">plot</span><span class="hl std">( mainData[[xvarAug]], mainData[[yvar]],</span>
+      <span class="hl kwc">xlab</span><span class="hl std">=xvarAug,</span> <span class="hl kwc">ylab</span><span class="hl std">=yvar,</span>
+      <span class="hl kwc">pch</span> <span class="hl std">=</span> <span class="hl num">19</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col1,</span>
+      <span class="hl kwc">main</span> <span class="hl std">=</span> <span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">&quot;Zusammenhang zwischen Handelsbilanzpositionen und Wechselkursen&quot;</span><span class="hl std">))</span>
+<span class="hl kwd">grid</span><span class="hl std">()</span>
+
+<span class="hl kwd">abline</span><span class="hl std">(</span><span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]]),</span> <span class="hl kwc">col</span><span class="hl std">=col2,</span> <span class="hl kwc">lwd</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+
+<span class="hl std">reg</span> <span class="hl kwb">=</span> <span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]])</span>
+<span class="hl std">sumreg</span> <span class="hl kwb">=</span> <span class="hl kwd">summary</span><span class="hl std">(reg)</span>
+<span class="hl std">r2</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">r.squared,</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+<span class="hl std">slope</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+<span class="hl std">pval</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">4</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+
+
+<span class="hl std">comment1</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(Koeffizient</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(slope))</span>
+<span class="hl std">comment2</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(R</span><span class="hl opt">^</span><span class="hl num">2</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(r2))</span>
+<span class="hl std">comment3</span> <span class="hl kwb">=</span> <span class="hl kwd">bquote</span><span class="hl std">(p</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(pval))</span>
+
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">10</span><span class="hl std">, comment1,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">14</span><span class="hl std">, comment2,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+<span class="hl kwd">text</span><span class="hl std">(</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">18</span><span class="hl std">, comment3,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+</pre></div>
+</div></div>
+
+
+<p>We are now ready to write the function. Copy the below code and save it as <code>getAnalysis.R</code> in the same working directory as the previous scripts.</p>
+
+<div class="chunk" id="unnamed-chunk-7"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com"># In this file, we define a function that does everything </span>
+<span class="hl com"># we did in the previous script, except that we get</span>
+<span class="hl com"># lots of flexibility thanks to ARGUMENTS!</span>
+
+<span class="hl std">getAnalysis</span> <span class="hl kwb">=</span> <span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">xvar</span><span class="hl std">,</span> <span class="hl kwc">yvar</span><span class="hl std">,</span> <span class="hl kwc">lag</span> <span class="hl std">=</span> <span class="hl num">0</span><span class="hl std">){</span>
+  <span class="hl com"># This is how the definition of a function looks like.</span>
+  <span class="hl com"># function name =  function(arg1, arg2, arg3 = default value)</span>
+  <span class="hl com"># The rest is wrapped in curly brackets</span>
+
+ <span class="hl com"># Here is some code we no longer need.</span>
+ <span class="hl com"># In fact, we MUST drop it, otherwise the </span>
+ <span class="hl com"># function does not work properly...</span>
+
+    <span class="hl com"># rm(list = ls()) </span>
+
+    <span class="hl com"># xvar = &quot;CHF pro Euro&quot;</span>
+    <span class="hl com"># yvar = &quot;Ausfuhr Total Veränderung real&quot;</span>
+    <span class="hl com"># lag = 1</span>
+
+    <span class="hl com"># All the below is like in the previous script!!</span>
+    <span class="hl std">xvarAug</span> <span class="hl kwb">=</span> <span class="hl kwd">paste0</span><span class="hl std">(xvar,</span> <span class="hl str">&quot; (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)</span>
+
+    <span class="hl com"># All libraries</span>
+    <span class="hl kwd">library</span><span class="hl std">(reshape2)</span>
+    <span class="hl kwd">library</span><span class="hl std">(stringr)</span>
+
+
+    <span class="hl com"># Working directory</span>
+    <span class="hl com"># !!! REPLACE THIS WITH WHAT FITS IN YOUR SITUATION !!!</span>
+    <span class="hl com">#setwd(&quot;~/Desktop/MacWork/Programmieren für Praxis/KursLiveMac&quot;) </span>
+    <span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">&quot;D:/Dropbox/Mac&amp;Surf/KursLiveDropb&quot;</span><span class="hl std">)</span>
+
+    <span class="hl com"># Load data (now mainData.Rdata)</span>
+    <span class="hl kwd">load</span><span class="hl std">(</span><span class="hl str">&quot;dataForAnalysisMerged.RData&quot;</span><span class="hl std">)</span>
+
+
+    <span class="hl com"># functions</span>
+    <span class="hl std">toLag</span> <span class="hl kwb">=</span> <span class="hl kwa">function</span><span class="hl std">(</span><span class="hl kwc">var</span><span class="hl std">,</span> <span class="hl kwc">lag</span><span class="hl std">) {</span>
+
+      <span class="hl kwa">if</span> <span class="hl std">(lag</span> <span class="hl opt">==</span> <span class="hl num">0</span><span class="hl std">){out</span> <span class="hl kwb">=</span> <span class="hl std">var }</span>
+
+      <span class="hl kwa">else</span> <span class="hl std">{ out</span> <span class="hl kwb">=</span> <span class="hl kwd">c</span><span class="hl std">(</span><span class="hl kwd">rep</span><span class="hl std">(</span><span class="hl num">NA</span><span class="hl std">, lag),</span> <span class="hl kwd">head</span><span class="hl std">(var,</span> <span class="hl opt">-</span><span class="hl std">lag))  }</span>
+    <span class="hl std">}</span>
+
+
+    <span class="hl com"># Plotting and regressions</span>
+
+    <span class="hl std">col1</span> <span class="hl kwb">=</span> <span class="hl str">&quot;#009999&quot;</span>
+    <span class="hl std">col2</span> <span class="hl kwb">=</span> <span class="hl str">&quot;red3&quot;</span>
+
+
+    <span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+      <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro Euro (Ver\u00e4nderung in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+    <span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+      <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro USD (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+    <span class="hl std">mainData[[</span><span class="hl kwd">paste0</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung in \u0025), Lag: &quot;</span><span class="hl std">, lag,</span> <span class="hl str">&quot; Quartal(e))&quot;</span><span class="hl std">)]]</span> <span class="hl kwb">=</span>
+      <span class="hl kwd">toLag</span><span class="hl std">(mainData[[</span><span class="hl str">&quot;CHF pro GBP (Ver\u00e4nderung) in \u0025)&quot;</span><span class="hl std">]], lag)</span>
+
+
+    <span class="hl kwd">plot</span><span class="hl std">( mainData[[xvarAug]], mainData[[yvar]],</span>
+          <span class="hl kwc">xlab</span><span class="hl std">=xvarAug,</span> <span class="hl kwc">ylab</span><span class="hl std">=yvar,</span>
+          <span class="hl kwc">pch</span> <span class="hl std">=</span> <span class="hl num">19</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col1,</span>
+          <span class="hl kwc">main</span> <span class="hl std">=</span> <span class="hl kwd">paste</span><span class="hl std">(</span><span class="hl str">&quot;Zusammenhang zwischen Handelsbilanzpositionen und Wechselkursen&quot;</span><span class="hl std">))</span>
+    <span class="hl kwd">grid</span><span class="hl std">()</span>
+
+    <span class="hl kwd">abline</span><span class="hl std">(</span><span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]]),</span> <span class="hl kwc">col</span><span class="hl std">=col2,</span> <span class="hl kwc">lwd</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+
+
+    <span class="hl std">reg</span> <span class="hl kwb">=</span> <span class="hl kwd">lm</span><span class="hl std">(mainData[[yvar]]</span><span class="hl opt">~</span><span class="hl std">mainData[[xvarAug]])</span>
+
+    <span class="hl std">sumreg</span> <span class="hl kwb">=</span> <span class="hl kwd">summary</span><span class="hl std">(reg)</span>
+    <span class="hl std">r2</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">r.squared,</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+    <span class="hl std">slope</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">1</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+    <span class="hl std">pval</span> <span class="hl kwb">=</span> <span class="hl kwd">round</span><span class="hl std">(sumreg</span><span class="hl opt">$</span><span class="hl std">coefficients[</span><span class="hl num">2</span><span class="hl std">,</span><span class="hl num">4</span><span class="hl std">],</span> <span class="hl kwc">digits</span> <span class="hl std">=</span> <span class="hl num">3</span><span class="hl std">)</span>
+
+
+    <span class="hl std">comment1</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">bquote</span><span class="hl std">(Koeffizient</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(slope))</span>
+    <span class="hl std">comment2</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">bquote</span><span class="hl std">(R</span><span class="hl opt">^</span><span class="hl num">2</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(r2))</span>
+    <span class="hl std">comment3</span> <span class="hl kwb">&lt;-</span> <span class="hl kwd">bquote</span><span class="hl std">(p</span> <span class="hl opt">==</span> <span class="hl kwd">.</span><span class="hl std">(pval))</span>
+
+    <span class="hl kwd">text</span><span class="hl std">(</span><span class="hl opt">-</span><span class="hl num">0</span><span class="hl std">,</span><span class="hl opt">-</span><span class="hl num">10</span><span class="hl std">, comment1,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+    <span class="hl kwd">text</span><span class="hl std">(</span><span class="hl opt">-</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">14</span><span class="hl std">, comment2,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+    <span class="hl kwd">text</span><span class="hl std">(</span><span class="hl opt">-</span><span class="hl num">0</span><span class="hl std">,</span> <span class="hl opt">-</span><span class="hl num">18</span><span class="hl std">, comment3,</span> <span class="hl kwc">cex</span> <span class="hl std">=</span> <span class="hl num">1</span><span class="hl std">,</span> <span class="hl kwc">col</span> <span class="hl std">= col2)</span>
+
+    <span class="hl com"># I added this, so you get regression output in file</span>
+    <span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;regOutput.txt&quot;</span><span class="hl std">)</span>
+    <span class="hl kwd">print</span><span class="hl std">(sumreg)</span>
+    <span class="hl kwd">sink</span><span class="hl std">()</span>
+    <span class="hl kwd">file.show</span><span class="hl std">(</span><span class="hl str">&quot;regOutput.txt&quot;</span><span class="hl std">)</span>
+
+<span class="hl std">}</span>  <span class="hl com"># do not forget the curly bracket at the end!</span>
+</pre></div>
+</div></div>
+
+
+<p>We call the function from a script that contains the below pieces of code.</p>
+
+<div class="chunk" id="unnamed-chunk-8"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com"># In this script, we finally analyze the data with all the </span>
+<span class="hl com"># flexibility we have built! </span>
+
+<span class="hl com"># We first load the data and make a codebook.</span>
+<span class="hl com"># Then we can copy/paste the entries in the </span>
+<span class="hl com"># codebook as function arguments.</span>
+<span class="hl com"># You will see that this is very powerful!</span>
+
+<span class="hl com"># Working directory</span>
+<span class="hl com"># !!! REPLACE THIS WITH WHAT FITS IN YOUR SITUATION !!!</span>
+<span class="hl com">#setwd(&quot;~/Desktop/MacWork/Programmieren für Praxis/KursLiveMac&quot;) </span>
+<span class="hl kwd">setwd</span><span class="hl std">(</span><span class="hl str">&quot;D:/Dropbox/Mac&amp;Surf/KursLiveDropb&quot;</span><span class="hl std">)</span>
+
+<span class="hl kwd">rm</span><span class="hl std">(</span><span class="hl kwc">list</span> <span class="hl std">=</span> <span class="hl kwd">ls</span><span class="hl std">())</span>
+
+<span class="hl com"># Load data (now mainData.Rdata)</span>
+<span class="hl kwd">load</span><span class="hl std">(</span><span class="hl str">&quot;dataForAnalysisMerged.RData&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># Make codebook</span>
+<span class="hl com"># Code almost literally copied from a piece</span>
+<span class="hl com"># of lecture 7</span>
+<span class="hl kwd">sink</span><span class="hl std">(</span><span class="hl str">&quot;Codebook.txt&quot;</span><span class="hl std">)</span>
+<span class="hl kwa">for</span> <span class="hl std">(i</span> <span class="hl kwa">in</span> <span class="hl num">2</span><span class="hl opt">:</span><span class="hl num">23</span><span class="hl std">){</span>
+  <span class="hl kwd">cat</span><span class="hl std">(</span><span class="hl str">&quot;[&quot;</span><span class="hl std">, i,</span> <span class="hl str">&quot;]&quot;</span><span class="hl std">,</span> <span class="hl str">&quot;\t&quot;</span><span class="hl std">,</span> <span class="hl kwd">names</span><span class="hl std">(mainData)[i],</span>  <span class="hl str">&quot;\n\n&quot;</span><span class="hl std">,</span> <span class="hl kwc">sep</span><span class="hl std">=</span><span class="hl str">&quot;&quot;</span><span class="hl std">)</span>
+<span class="hl std">}</span>
+<span class="hl kwd">sink</span><span class="hl std">()</span>
+<span class="hl com">#file.show(&quot;Codebook.txt&quot;)</span>
+
+<span class="hl com"># THIS IS VERY IMPORTANT</span>
+<span class="hl com"># You need to CALL the function from the file we've</span>
+<span class="hl com"># just written!</span>
+<span class="hl kwd">source</span><span class="hl std">(</span><span class="hl str">&quot;getAnalysis.R&quot;</span><span class="hl std">)</span>
+
+<span class="hl com"># And here we use the function!</span>
+<span class="hl kwd">getAnalysis</span><span class="hl std">(</span><span class="hl str">&quot;CHF pro GBP&quot;</span><span class="hl std">,</span>
+            <span class="hl str">&quot;Ausfuhr Total Veränderung real&quot;</span><span class="hl std">,</span> <span class="hl num">0</span><span class="hl std">)</span>
+</pre></div>
+</div></div>
+
+<p>Now you are ready to get whatever plots or regressions you like to investigate the relationship between exchange rates and current account balance items!</p>
+
+<p><b>I hope you enjoyed this course and have learned some useful things!</b></p>
 
 </div> <!-- end of div scriptText -->
 
